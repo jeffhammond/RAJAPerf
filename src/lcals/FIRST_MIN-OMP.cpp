@@ -12,6 +12,10 @@
 
 #include <iostream>
 
+#if (_OPENMP >= 201811) && !defined(__PGI)
+#define RAJA_ENABLE_OPENMP_USERDEF_REDUCTIONS
+#endif
+
 namespace rajaperf 
 {
 namespace lcals
@@ -36,12 +40,16 @@ void FIRST_MIN::runOpenMPVariant(VariantID vid)
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
+#ifdef RAJA_ENABLE_OPENMP_USERDEF_REDUCTIONS
         #pragma omp declare reduction(minloc : MyMinLoc : \
                                       omp_out = MinLoc_compare(omp_out, omp_in))
+#endif
 
         FIRST_MIN_MINLOC_INIT;
 
+#ifdef RAJA_ENABLE_OPENMP_USERDEF_REDUCTIONS
         #pragma omp parallel for reduction(minloc:mymin)
+#endif
         for (Index_type i = ibegin; i < iend; ++i ) {
           FIRST_MIN_BODY; 
         }
@@ -63,12 +71,16 @@ void FIRST_MIN::runOpenMPVariant(VariantID vid)
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
+#ifdef RAJA_ENABLE_OPENMP_USERDEF_REDUCTIONS
         #pragma omp declare reduction(minloc : MyMinLoc : \
                                       omp_out = MinLoc_compare(omp_out, omp_in))
+#endif
 
         FIRST_MIN_MINLOC_INIT;
 
+#ifdef RAJA_ENABLE_OPENMP_USERDEF_REDUCTIONS
         #pragma omp parallel for reduction(minloc:mymin)
+#endif
         for (Index_type i = ibegin; i < iend; ++i ) {
           if ( firstmin_base_lam(i) < mymin.val ) {
             mymin.val = x[i];
