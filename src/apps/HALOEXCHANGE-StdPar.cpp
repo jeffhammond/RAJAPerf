@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -34,13 +39,20 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota((Index_type)0,num_neighbors);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(0);
+      thrust::counting_iterator<Index_type> end(num_neighbors);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type l) {
           Real_ptr buffer = buffers[l];
           Int_ptr list = pack_index_lists[l];
@@ -55,7 +67,7 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type l) {
           Real_ptr buffer = buffers[l];
           Int_ptr list = unpack_index_lists[l];
@@ -77,13 +89,20 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota((Index_type)0,num_neighbors);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(0);
+      thrust::counting_iterator<Index_type> end(num_neighbors);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type l) {
           Real_ptr buffer = buffers[l];
           Int_ptr list = pack_index_lists[l];
@@ -101,7 +120,7 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type l) {
           Real_ptr buffer = buffers[l];
           Int_ptr list = unpack_index_lists[l];

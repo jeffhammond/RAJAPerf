@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -34,14 +39,21 @@ void LTIMES::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota((Index_type)0,num_z);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(0);
+      thrust::counting_iterator<Index_type> end(num_z);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type z) {
+                       begin, end,
+                       [=](Index_type z) {
           for (Index_type g = 0; g < num_g; ++g ) {
             for (Index_type m = 0; m < num_m; ++m ) {
               for (Index_type d = 0; d < num_d; ++d ) {
@@ -64,14 +76,21 @@ void LTIMES::runStdParVariant(VariantID vid)
                                LTIMES_BODY;
                              };
 
+#ifdef USE_RANGES
       auto range = std::views::iota((Index_type)0,num_z);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(0);
+      thrust::counting_iterator<Index_type> end(num_z);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type z) {
+                       begin, end,
+                       [=](Index_type z) {
           for (Index_type g = 0; g < num_g; ++g ) {
             for (Index_type m = 0; m < num_m; ++m ) {
               for (Index_type d = 0; d < num_d; ++d ) {

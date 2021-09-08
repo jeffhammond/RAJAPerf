@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -55,44 +60,51 @@ void ENERGY::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY1;
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY2;
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY3;
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY4;
         });
   
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY5;
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           ENERGY_BODY6;
         });
 
@@ -104,44 +116,51 @@ void ENERGY::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin,iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam1(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam2(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam3(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam4(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam5(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           energy_lam6(i);
         });
 

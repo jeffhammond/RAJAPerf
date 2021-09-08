@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -54,9 +59,16 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
           }
         }
 
+#ifdef USE_RANGES
         auto range = std::views::iota((Index_type)0,pack_index);
+        auto begin = std::begin(range);
+        auto end   = std::end(range);
+#else
+        thrust::counting_iterator<Index_type> begin(0);
+        thrust::counting_iterator<Index_type> end(pack_index);
+#endif
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type j) {
           Real_ptr   buffer = pack_ptr_holders[j].buffer;
           Int_ptr    list   = pack_ptr_holders[j].list;
@@ -82,10 +94,17 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
           }
         }
 
+#ifdef USE_RANGES
         auto range2 = std::views::iota((Index_type)0,unpack_index);
+        auto begin2 = std::begin(range2);
+        auto end2   = std::end(range2);
+#else
+        thrust::counting_iterator<Index_type> begin2(0);
+        thrust::counting_iterator<Index_type> end2(unpack_index);
+#endif
         std::for_each( std::execution::par_unseq,
-                        std::begin(range2), std::end(range2),
-                        [=](Index_type j) {
+                       begin2, end2,
+                       [=](Index_type j) {
           Real_ptr   buffer = unpack_ptr_holders[j].buffer;
           Int_ptr    list   = unpack_ptr_holders[j].list;
           Real_ptr   var    = unpack_ptr_holders[j].var;
@@ -124,10 +143,17 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
             buffer += len;
           }
         }
+#ifdef USE_RANGES
         auto range = std::views::iota((Index_type)0,pack_index);
+        auto begin = std::begin(range);
+        auto end   = std::end(range);
+#else
+        thrust::counting_iterator<Index_type> begin(0);
+        thrust::counting_iterator<Index_type> end(pack_index);
+#endif
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type j) {
+                       begin, end,
+                       [=](Index_type j) {
           auto       pack_lambda = pack_lambdas[j];
           Index_type len         = pack_lens[j];
           for (Index_type i = 0; i < len; i++) {

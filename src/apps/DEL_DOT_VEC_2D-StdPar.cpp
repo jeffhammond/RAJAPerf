@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -45,14 +50,21 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin,iend);
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type ii) {
+                       begin, end,
+                       [=](Index_type ii) {
           DEL_DOT_VEC_2D_BODY_INDEX;
           DEL_DOT_VEC_2D_BODY;
         });
@@ -70,14 +82,21 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
                                     DEL_DOT_VEC_2D_BODY;
                                   };
 
+#ifdef USE_RANGES
       auto range = std::views::iota(ibegin,iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type ii) {
+                       begin, end,
+                       [=](Index_type ii) {
           deldotvec2d_base_lam(ii);
         });
 

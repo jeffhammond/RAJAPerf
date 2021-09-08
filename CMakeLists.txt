@@ -26,7 +26,7 @@ set(ENABLE_EXAMPLES Off CACHE BOOL "Enable RAJA examples")
 set(RAJA_ENABLE_EXERCISES Off CACHE BOOL "Enable RAJA exercises")
 
 if (ENABLE_STDPAR)
-  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 17)
 else()
   set(CMAKE_CXX_STANDARD 11)
 endif()

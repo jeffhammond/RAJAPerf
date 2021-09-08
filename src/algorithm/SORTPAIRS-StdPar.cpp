@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 #include <vector>
@@ -37,7 +42,14 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -59,7 +71,7 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
 
         //for (Index_type iemp = ibegin; iemp < iend; ++iemp) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type iemp) {
           const pair_type& pair = vector_of_pairs[iemp - ibegin];
           x[iend*irep + iemp] = pair.first;
