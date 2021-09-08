@@ -56,7 +56,7 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
         Real_type pi = m_pi_init;
         pi += std::transform_reduce( std::execution::par_unseq,
                                      begin, end,
-                                      0.0, std::plus<>(),
+                                     0.0, std::plus<>(),
                         [=](Index_type i) {
           double x = (double(i) + 0.5) * dx;
           return dx / (1.0 + x * x);
@@ -80,11 +80,9 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         Real_type pi = m_pi_init;
-
         pi += std::transform_reduce( std::execution::par_unseq,
                                      begin, end,
-                                      0.0, std::plus<>(), pireduce_base_lam);
-
+                                     0.0, std::plus<>(), pireduce_base_lam);
         m_pi = 4.0 * pi;
 
       }
