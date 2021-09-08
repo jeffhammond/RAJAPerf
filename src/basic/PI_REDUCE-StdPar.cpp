@@ -17,6 +17,7 @@
 #endif
 
 #include <algorithm>
+#include <numeric>
 #include <execution>
 
 #include <iostream>
@@ -25,7 +26,6 @@ namespace rajaperf
 {
 namespace basic
 {
-
 
 void PI_REDUCE::runStdParVariant(VariantID vid)
 {

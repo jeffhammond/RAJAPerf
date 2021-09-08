@@ -17,6 +17,7 @@
 #endif
 
 #include <algorithm>
+#include <numeric>
 #include <execution>
 
 #include <iostream>
