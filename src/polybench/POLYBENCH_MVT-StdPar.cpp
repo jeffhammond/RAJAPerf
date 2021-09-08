@@ -35,6 +35,8 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
 
 #ifdef USE_RANGES
   auto range = std::views::iota((Index_type)0,N);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
 #else
   thrust::counting_iterator<Index_type> begin(0);
   thrust::counting_iterator<Index_type> end(N);
