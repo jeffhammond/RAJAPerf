@@ -10,8 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <array>
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -31,13 +35,20 @@ void REDUCE3_INT::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   REDUCE3_INT_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota(ibegin, iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -45,8 +56,8 @@ void REDUCE3_INT::runStdParVariant(VariantID vid)
         typedef std::array<Int_type,3> Reduce_type;
         Reduce_type result =
         std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
-                                      Reduce_type{m_vsum_init,m_vmin_init,m_vmax_init},
+                                     begin, end,
+                                     Reduce_type{m_vsum_init,m_vmin_init,m_vmax_init},
                         [=](Reduce_type a, Reduce_type b) -> Reduce_type {
                              auto plus = a[0] + b[0];
                              auto min  = std::min(a[1],b[1]);

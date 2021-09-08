@@ -36,20 +36,20 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+  auto range = std::views::iota(ibegin, iend);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(ibegin);
+  thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   SORTPAIRS_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_RANGES
-      auto range = std::views::iota(ibegin, iend);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(ibegin);
-      thrust::counting_iterator<Index_type> end(iend);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

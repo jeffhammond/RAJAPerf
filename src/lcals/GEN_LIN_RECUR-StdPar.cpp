@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -21,7 +26,6 @@ namespace rajaperf
 namespace lcals
 {
 
-
 void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 {
 #if defined(RUN_STDPAR)
@@ -29,6 +33,20 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
   const Index_type run_reps = getRunReps();
 
   GEN_LIN_RECUR_DATA_SETUP;
+
+#ifdef USE_RANGES
+  auto rangeK = std::views::iota((Index_type)0,N);
+  auto rangeI = std::views::iota((Index_type)1,N+1);
+  auto beginK = std::begin(rangeK);
+  auto endK   = std::end(rangeK);
+  auto beginI = std::begin(rangeI);
+  auto endI   = std::end(rangeI);
+#else
+  thrust::counting_iterator<Index_type> beginK(0);
+  thrust::counting_iterator<Index_type> endK(N);
+  thrust::counting_iterator<Index_type> beginI(1);
+  thrust::counting_iterator<Index_type> endI(N+1);
+#endif
 
   auto genlinrecur_lam1 = [=](Index_type k) {
                             GEN_LIN_RECUR_BODY1;
@@ -41,23 +59,20 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto rangeK = std::views::iota((Index_type)0,N);
-      auto rangeI = std::views::iota((Index_type)1,N+1);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         //for (Index_type k = 0; k < N; ++k ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeK), std::end(rangeK),
-                        [=](Index_type k) {
+                       beginK, endK,
+                       [=](Index_type k) {
           GEN_LIN_RECUR_BODY1;
         });
 
         //for (Index_type i = 1; i < N+1; ++i ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeI), std::end(rangeI),
-                        [=](Index_type i) {
+                       beginI, endI,
+                       [=](Index_type i) {
           GEN_LIN_RECUR_BODY2;
         });
 
@@ -69,23 +84,20 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto rangeK = std::views::iota((Index_type)0,N);
-      auto rangeI = std::views::iota((Index_type)1,N+1);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         //for (Index_type k = 0; k < N; ++k ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeK), std::end(rangeK),
-                        [=](Index_type k) {
+                       beginK, endK,
+                       [=](Index_type k) {
           genlinrecur_lam1(k);
         });
 
         //for (Index_type i = 1; i < N+1; ++i ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeI), std::end(rangeI),
-                        [=](Index_type i) {
+                       beginI, endI,
+                       [=](Index_type i) {
           genlinrecur_lam2(i);
         });
 

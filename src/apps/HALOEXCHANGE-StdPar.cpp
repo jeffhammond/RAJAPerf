@@ -35,18 +35,18 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
 
   HALOEXCHANGE_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)0,num_neighbors);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(0);
+  thrust::counting_iterator<Index_type> end(num_neighbors);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_RANGES
-      auto range = std::views::iota((Index_type)0,num_neighbors);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(0);
-      thrust::counting_iterator<Index_type> end(num_neighbors);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -88,15 +88,6 @@ void HALOEXCHANGE::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-#ifdef USE_RANGES
-      auto range = std::views::iota((Index_type)0,num_neighbors);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(0);
-      thrust::counting_iterator<Index_type> end(num_neighbors);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -21,7 +26,6 @@ namespace rajaperf
 namespace lcals
 {
 
-
 void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
 {
 #if defined(RUN_STDPAR)
@@ -29,6 +33,15 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 1;
   const Index_type iend = m_N;
+
+#ifdef USE_RANGES
+  auto range = std::views::iota(ibegin, iend);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(ibegin);
+  thrust::counting_iterator<Index_type> end(iend);
+#endif
 
   TRIDIAG_ELIM_DATA_SETUP;
 
@@ -40,14 +53,12 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           TRIDIAG_ELIM_BODY;
         });
 
@@ -59,17 +70,14 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           tridiag_elim_lam(i);
         });
-
       }
       stopTimer();
 

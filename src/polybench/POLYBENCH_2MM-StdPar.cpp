@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -31,35 +36,65 @@ void POLYBENCH_2MM::runStdParVariant(VariantID vid)
 
   POLYBENCH_2MM_DATA_SETUP;
 
+#ifdef USE_RANGES
+#  ifdef USE_STDPAR_COLLAPSE
+  auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
+  auto beginIJ = std::begin(rangeIJ);
+  auto endIJ   = std::end(rangeIJ);
+  auto rangeIL = std::views::iota((Index_type)0, ni*nl);
+  auto beginIL = std::begin(rangeIL);
+  auto endIL   = std::end(rangeIL);
+#  else
+  auto rangeI = std::views::iota((Index_type)0, ni);
+  auto beginI = std::begin(rangeI);
+  auto endI   = std::end(rangeI);
+  auto rangeL = std::views::iota((Index_type)0, nl);
+  auto beginL = std::begin(rangeL);
+  auto endL   = std::end(rangeL);
+#  endif
+  auto rangeJ = std::views::iota((Index_type)0, nj);
+  auto beginJ = std::begin(rangeJ);
+  auto endJ   = std::end(rangeJ);
+  auto rangeK = std::views::iota((Index_type)0, nk);
+  auto beginK = std::begin(rangeK);
+  auto endK   = std::end(rangeK);
+#else
+#  ifdef USE_STDPAR_COLLAPSE
+  thrust::counting_iterator<Index_type> beginIJ(0);
+  thrust::counting_iterator<Index_type> endIJ(ni*nj);
+  thrust::counting_iterator<Index_type> beginIL(0);
+  thrust::counting_iterator<Index_type> endIL(ni*nl);
+#  else
+  thrust::counting_iterator<Index_type> beginI(0);
+  thrust::counting_iterator<Index_type> endI(ni);
+  thrust::counting_iterator<Index_type> beginL(0);
+  thrust::counting_iterator<Index_type> endL(nl);
+#  endif
+  thrust::counting_iterator<Index_type> beginJ(0);
+  thrust::counting_iterator<Index_type> endJ(nj);
+  thrust::counting_iterator<Index_type> beginK(0);
+  thrust::counting_iterator<Index_type> endK(nk);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_STDPAR_COLLAPSE
-      auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-      auto rangeIL = std::views::iota((Index_type)0, ni*nl);
-#else
-      auto rangeI = std::views::iota((Index_type)0, ni);
-      auto rangeL = std::views::iota((Index_type)0, nl);
-#endif
-      auto rangeJ = std::views::iota((Index_type)0, nj);
-      auto rangeK = std::views::iota((Index_type)0, nk);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIJ), std::end(rangeIJ), [=](Index_type ij) {
+                       beginIJ, endIJ, [=](Index_type ij) {
             const auto i  = ij / nj;
             const auto j  = ij % nj;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeJ), std::end(rangeJ), [=](Index_type j) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginJ, endJ, [=](Index_type j) {
 #endif
             POLYBENCH_2MM_BODY1;
-            std::for_each( std::begin(rangeK), std::end(rangeK), [=,&dot](Index_type k) {
+            std::for_each(beginK, endK, [=,&dot](Index_type k) {
               POLYBENCH_2MM_BODY2;
             });
             POLYBENCH_2MM_BODY3;
@@ -70,16 +105,16 @@ void POLYBENCH_2MM::runStdParVariant(VariantID vid)
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIL), std::end(rangeIL), [=](Index_type il) {
+                       beginIL, endIL, [=](Index_type il) {
             const auto i  = il / nl;
             const auto l  = il % nl;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeL), std::end(rangeL), [=](Index_type l) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginL, endL, [=](Index_type l) {
 #endif
             POLYBENCH_2MM_BODY4;
-            std::for_each( std::begin(rangeJ), std::end(rangeJ), [=,&dot](Index_type j) {
+            std::for_each(beginJ, endJ, [=,&dot](Index_type j) {
               POLYBENCH_2MM_BODY5;
             });
             POLYBENCH_2MM_BODY6;
@@ -113,31 +148,21 @@ void POLYBENCH_2MM::runStdParVariant(VariantID vid)
                                   POLYBENCH_2MM_BODY6;
                                 };
 
-#ifdef USE_STDPAR_COLLAPSE
-      auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-      auto rangeIL = std::views::iota((Index_type)0, ni*nl);
-#else
-      auto rangeI = std::views::iota((Index_type)0, ni);
-      auto rangeL = std::views::iota((Index_type)0, nl);
-#endif
-      auto rangeJ = std::views::iota((Index_type)0, nj);
-      auto rangeK = std::views::iota((Index_type)0, nk);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIJ), std::end(rangeIJ), [=](Index_type ij) {
+                       beginIJ, endIJ, [=](Index_type ij) {
             const auto i  = ij / nj;
             const auto j  = ij % nj;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeJ), std::end(rangeJ), [=](Index_type j) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginJ, endJ, [=](Index_type j) {
 #endif
             POLYBENCH_2MM_BODY1;
-            std::for_each( std::begin(rangeK), std::end(rangeK), [=,&dot](Index_type k) {
+            std::for_each(beginK, endK, [=,&dot](Index_type k) {
               poly_2mm_base_lam2(i, j, k, dot);
             });
             poly_2mm_base_lam3(i, j, dot);
@@ -148,16 +173,16 @@ void POLYBENCH_2MM::runStdParVariant(VariantID vid)
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIL), std::end(rangeIL), [=](Index_type il) {
+                       beginIL, endIL, [=](Index_type il) {
             const auto i  = il / nl;
             const auto l  = il % nl;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeL), std::end(rangeL), [=](Index_type l) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginL, endL, [=](Index_type l) {
 #endif
             POLYBENCH_2MM_BODY4;
-            std::for_each( std::begin(rangeJ), std::end(rangeJ), [=,&dot](Index_type j) {
+            std::for_each(beginJ, endJ, [=,&dot](Index_type j) {
               poly_2mm_base_lam5(i, l, j, dot);
             });
             poly_2mm_base_lam6(i, l, dot);

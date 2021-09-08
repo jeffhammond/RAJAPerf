@@ -35,18 +35,18 @@ void LTIMES::runStdParVariant(VariantID vid)
 
   LTIMES_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)0,num_z);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(0);
+  thrust::counting_iterator<Index_type> end(num_z);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_RANGES
-      auto range = std::views::iota((Index_type)0,num_z);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(0);
-      thrust::counting_iterator<Index_type> end(num_z);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -75,15 +75,6 @@ void LTIMES::runStdParVariant(VariantID vid)
                                  Index_type g, Index_type m) {
                                LTIMES_BODY;
                              };
-
-#ifdef USE_RANGES
-      auto range = std::views::iota((Index_type)0,num_z);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(0);
-      thrust::counting_iterator<Index_type> end(num_z);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -34,30 +39,44 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
                           NESTED_INIT_BODY;
                         };
 
+#ifdef USE_STDPAR_COLLAPSE
+#  ifdef USE_RANGES
+        auto range = std::views::iota((Index_type)0, ni*nj*nk);
+        auto begin = std::begin(range);
+        auto end   = std::end(range);
+#  else
+        thrust::counting_iterator<Index_type> begin(0);
+        thrust::counting_iterator<Index_type> end(ni*nj*nk);
+#  endif
+#else
+#  ifdef USE_RANGES
+        auto range = std::views::iota((Index_type)0, nk);
+        auto begin = std::begin(range);
+        auto end   = std::end(range);
+#  else
+        thrust::counting_iterator<Index_type> begin(0);
+        thrust::counting_iterator<Index_type> end(nk);
+#  endif
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_STDPAR_COLLAPSE
-      auto range = std::views::iota((Index_type)0, ni*nj*nk);
-#else
-      auto range = std::views::iota((Index_type)0, nk);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type idx) {
+                       begin, end,
+                       [=](Index_type idx) {
               const auto k  = idx / (nj*ni);
               const auto ij = idx % (nj*ni);
               const auto j  = ij / ni;
               const auto i  = ij % ni;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                       begin, end,
                         [=](Index_type k) {
             for (Index_type j = 0; j < nj; ++j )
               for (Index_type i = 0; i < ni; ++i )
@@ -76,27 +95,21 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-#ifdef USE_STDPAR_COLLAPSE
-      auto range = std::views::iota((Index_type)0, ni*nj*nk);
-#else
-      auto range = std::views::iota((Index_type)0, nk);
-#endif
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type idx) {
+                       begin, end,
+                       [=](Index_type idx) {
               const auto k  = idx / (nj*ni);
               const auto ij = idx % (nj*ni);
               const auto j  = ij / ni;
               const auto i  = ij % ni;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type k) {
+                       begin, end,
+                       [=](Index_type k) {
             for (Index_type j = 0; j < nj; ++j )
               for (Index_type i = 0; i < ni; ++i )
 #endif

@@ -10,8 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <atomic>
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -31,21 +35,28 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+  auto range = std::views::iota(ibegin, iend);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(ibegin);
+  thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   PI_ATOMIC_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::atomic<double> a_pi{m_pi_init};
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range),
-                        [=,&a_pi](Index_type i) {
+                       begin, end,
+                       [=,&a_pi](Index_type i) {
           double x = (double(i) + 0.5) * dx;
           a_pi += dx / (1.0 + x * x);
         });

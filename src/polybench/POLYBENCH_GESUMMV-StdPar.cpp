@@ -10,13 +10,16 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
 #include <iostream>
-
-#define USE_STDPAR_COLLAPSE 1
 
 namespace rajaperf 
 {
@@ -31,19 +34,26 @@ void POLYBENCH_GESUMMV::runStdParVariant(VariantID vid)
 
   POLYBENCH_GESUMMV_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)0, N);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(0);
+  thrust::counting_iterator<Index_type> end(N);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)0, N);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range), [=](Index_type i) {
+                       begin, end, [=](Index_type i) {
           POLYBENCH_GESUMMV_BODY1;
-          std::for_each( std::begin(range), std::end(range), [=,&tmpdot,&ydot](Index_type j) {
+          std::for_each(begin, end, [=,&tmpdot,&ydot](Index_type j) {
             POLYBENCH_GESUMMV_BODY2;
           });
           POLYBENCH_GESUMMV_BODY3;
@@ -54,7 +64,6 @@ void POLYBENCH_GESUMMV::runStdParVariant(VariantID vid)
 
       break;
     }
-
 
     case Lambda_StdPar : {
 
@@ -67,15 +76,13 @@ void POLYBENCH_GESUMMV::runStdParVariant(VariantID vid)
                                       POLYBENCH_GESUMMV_BODY3;
                                     };
 
-      auto range = std::views::iota((Index_type)0, N);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range), [=](Index_type i) {
+                       begin, end, [=](Index_type i) {
           POLYBENCH_GESUMMV_BODY1;
-          std::for_each( std::begin(range), std::end(range), [=,&tmpdot,&ydot](Index_type j) {
+          std::for_each(begin, end, [=,&tmpdot,&ydot](Index_type j) {
             poly_gesummv_base_lam2(i, j, tmpdot, ydot);
           });
           poly_gesummv_base_lam3(i, tmpdot, ydot);

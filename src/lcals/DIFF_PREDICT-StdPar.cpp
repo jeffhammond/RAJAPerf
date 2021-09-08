@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -30,6 +35,15 @@ void DIFF_PREDICT::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   DIFF_PREDICT_DATA_SETUP;
 
   auto diffpredict_lam = [=](Index_type i) {
@@ -40,14 +54,12 @@ void DIFF_PREDICT::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           DIFF_PREDICT_BODY;
         });
 
@@ -59,14 +71,12 @@ void DIFF_PREDICT::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           diffpredict_lam(i);
         });
       }

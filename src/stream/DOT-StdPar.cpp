@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -21,7 +26,6 @@ namespace rajaperf
 namespace stream
 {
 
-
 void DOT::runStdParVariant(VariantID vid)
 {
 #if defined(RUN_STDPAR)
@@ -29,6 +33,15 @@ void DOT::runStdParVariant(VariantID vid)
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
+
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
 
   DOT_DATA_SETUP;
 
@@ -58,18 +71,16 @@ void DOT::runStdParVariant(VariantID vid)
                             return a[i] * b[i];
                           };
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         Real_type dot = m_dot_init;
 
         dot += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
-                                      (Real_type)0,
-                                      std::plus<Real_type>(),
-                                      dot_base_lam);
+                                     begin, end,
+                                     (Real_type)0,
+                                     std::plus<Real_type>(),
+                                     dot_base_lam);
 
         m_dot += dot;
 

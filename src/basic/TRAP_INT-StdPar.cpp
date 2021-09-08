@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -43,13 +48,20 @@ void TRAP_INT::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   TRAP_INT_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota(ibegin, iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -57,8 +69,8 @@ void TRAP_INT::runStdParVariant(VariantID vid)
         Real_type sumx = m_sumx_init;
 
         sumx += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
-                                      0.0, std::plus<>(),
+                                     begin, end,
+                                     0.0, std::plus<>(),
                         [=](Index_type i) {
           Real_type x = x0 + i*h;
           return trap_int_func(x, y, xp, yp);
@@ -78,16 +90,14 @@ void TRAP_INT::runStdParVariant(VariantID vid)
                                 return trap_int_func(x, y, xp, yp);
                               };
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         Real_type sumx = m_sumx_init;
 
         sumx += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
-                                      0.0, std::plus<>(), trapint_base_lam);
+                                     begin, end,
+                                     0.0, std::plus<>(), trapint_base_lam);
 
         m_sumx += sumx * h;
 

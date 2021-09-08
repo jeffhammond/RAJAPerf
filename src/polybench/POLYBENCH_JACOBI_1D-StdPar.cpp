@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -30,11 +35,16 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
 
   POLYBENCH_JACOBI_1D_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)1,N-1);
+#else
+  thrust::counting_iterator<Index_type> begin(1);
+  thrust::counting_iterator<Index_type> end(N-1);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)1,N-1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -42,13 +52,13 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             POLYBENCH_JACOBI_1D_BODY1;
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             POLYBENCH_JACOBI_1D_BODY2;
           });
 
@@ -64,14 +74,12 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-  auto poly_jacobi1d_lam1 = [=] (Index_type i) {
-                              POLYBENCH_JACOBI_1D_BODY1;
-                            };
-  auto poly_jacobi1d_lam2 = [=] (Index_type i) {
-                              POLYBENCH_JACOBI_1D_BODY2;
-                            };
-
-      auto range = std::views::iota((Index_type)1,N-1);
+      auto poly_jacobi1d_lam1 = [=] (Index_type i) {
+                                  POLYBENCH_JACOBI_1D_BODY1;
+                                };
+      auto poly_jacobi1d_lam2 = [=] (Index_type i) {
+                                  POLYBENCH_JACOBI_1D_BODY2;
+                                };
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -79,12 +87,12 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                         begin, end,
                           [=](Index_type i) {
             poly_jacobi1d_lam1(i);
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                         begin, end,
                           [=](Index_type i) {
             poly_jacobi1d_lam2(i);
           });

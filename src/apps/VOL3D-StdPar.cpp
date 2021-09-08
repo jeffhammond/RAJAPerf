@@ -12,7 +12,12 @@
 
 #include "AppsData.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -46,14 +51,21 @@ void VOL3D::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<int> begin(ibegin);
+      thrust::counting_iterator<int> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           VOL3D_BODY;
         });
 
@@ -65,14 +77,21 @@ void VOL3D::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
+#ifdef USE_RANGES
       auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<int> begin(ibegin);
+      thrust::counting_iterator<int> end(iend);
+#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           vol3d_lam(i);
         });
 

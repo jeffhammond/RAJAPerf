@@ -10,14 +10,21 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
 #include <iostream>
 
-namespace rajaperf {
-namespace apps {
+namespace rajaperf 
+{
+namespace apps
+{
 
 //#define USE_RAJA_UNROLL
 #define RAJA_DIRECT_PRAGMA(X) _Pragma(#X)
@@ -39,14 +46,21 @@ void MASS3DPA::runStdParVariant(VariantID vid) {
 
   case Base_StdPar: {
 
+#ifdef USE_RANGES
     auto range = std::views::iota(0,(int)NE);
+    auto begin = std::begin(range);
+    auto end   = std::end(range);
+#else
+    thrust::counting_iterator<int> begin(0);
+    thrust::counting_iterator<int> end(NE);
+#endif
 
     startTimer();
     for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
       std::for_each( std::execution::par_unseq,
-                      std::begin(range), std::end(range),
-                      [=](int e) {
+                     begin, end,
+                     [=](int e) {
 
         MASS3DPA_0_CPU
 

@@ -39,6 +39,15 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = m_domain->n_real_zones;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota(ibegin, iend);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(ibegin);
+  thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   DEL_DOT_VEC_2D_DATA_SETUP;
 
   NDSET2D(m_domain->jp, x,x1,x2,x3,x4) ;
@@ -49,15 +58,6 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_RANGES
-      auto range = std::views::iota(ibegin, iend);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(ibegin);
-      thrust::counting_iterator<Index_type> end(iend);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -81,15 +81,6 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
                                     DEL_DOT_VEC_2D_BODY_INDEX;
                                     DEL_DOT_VEC_2D_BODY;
                                   };
-
-#ifdef USE_RANGES
-      auto range = std::views::iota(ibegin,iend);
-      auto begin = std::begin(range);
-      auto end   = std::end(range);
-#else
-      thrust::counting_iterator<Index_type> begin(ibegin);
-      thrust::counting_iterator<Index_type> end(iend);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

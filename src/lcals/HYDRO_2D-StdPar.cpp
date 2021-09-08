@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -32,43 +37,54 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
   const Index_type jbeg = 1;
   const Index_type jend = m_jn - 1;
 
+#ifdef USE_RANGES
+  auto rangeK = std::views::iota(kbeg, kend);
+  auto beginK = std::begin(rangeK);
+  auto endK   = std::end(rangeK);
+  auto rangeJ = std::views::iota(jbeg, jend);
+  auto beginJ = std::begin(rangeJ);
+  auto endJ   = std::end(rangeJ);
+#else
+  thrust::counting_iterator<Index_type> beginK(kbeg);
+  thrust::counting_iterator<Index_type> endK(kend);
+  thrust::counting_iterator<Index_type> beginJ(jbeg);
+  thrust::counting_iterator<Index_type> endJ(jend);
+#endif
+
   HYDRO_2D_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
 
-      auto rangeK = std::views::iota(kbeg, kend);
-      auto rangeJ = std::views::iota(jbeg, jend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY1;
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY2;
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY3;
           });
@@ -92,37 +108,34 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
                                  HYDRO_2D_BODY3;
                                };
 
-      auto rangeK = std::views::iota(kbeg, kend);
-      auto rangeJ = std::views::iota(jbeg, jend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam1(k, j);
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam2(k, j);
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                       beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                       beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam3(k, j);
           });

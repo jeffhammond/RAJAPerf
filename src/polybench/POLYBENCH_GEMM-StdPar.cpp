@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -31,34 +36,56 @@ void POLYBENCH_GEMM::runStdParVariant(VariantID vid)
 
   POLYBENCH_GEMM_DATA_SETUP;
 
+#ifdef USE_RANGES
+#  ifdef USE_STDPAR_COLLAPSE
+  auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
+  auto beginIJ = std::begin(rangeIJ);
+  auto endIJ   = std::end(rangeIJ);
+#  else
+  auto rangeI = std::views::iota((Index_type)0, ni);
+  auto beginI = std::begin(rangeI);
+  auto endI   = std::end(rangeI);
+  auto rangeJ = std::views::iota((Index_type)0, nj);
+  auto beginJ = std::begin(rangeJ);
+  auto endJ   = std::end(rangeJ);
+#  endif
+  auto rangeK = std::views::iota((Index_type)0, nk);
+  auto beginK = std::begin(rangeK);
+  auto endK   = std::end(rangeK);
+#else
+#  ifdef USE_STDPAR_COLLAPSE
+  thrust::counting_iterator<Index_type> beginIJ(0);
+  thrust::counting_iterator<Index_type> endIJ(ni*nj);
+#  else
+  thrust::counting_iterator<Index_type> beginI(0);
+  thrust::counting_iterator<Index_type> beginJ(0);
+  thrust::counting_iterator<Index_type> endJ(nj);
+  thrust::counting_iterator<Index_type> endI(ni);
+#  endif
+  thrust::counting_iterator<Index_type> beginK(0);
+  thrust::counting_iterator<Index_type> endK(nk);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-#ifdef USE_STDPAR_COLLAPSE
-      auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-#else
-      auto rangeI = std::views::iota((Index_type)0, ni);
-      auto rangeJ = std::views::iota((Index_type)0, nj);
-#endif
-      auto rangeK = std::views::iota((Index_type)0, nk);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIJ), std::end(rangeIJ), [=](Index_type ij) {
+                       beginIJ, endIJ, [=](Index_type ij) {
             const auto i  = ij / nj;
             const auto j  = ij % nj;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeJ), std::end(rangeJ), [=](Index_type j) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginJ, endJ, [=](Index_type j) {
 #endif
             POLYBENCH_GEMM_BODY1;
             POLYBENCH_GEMM_BODY2;
-            std::for_each( std::begin(rangeK), std::end(rangeK), [=,&dot](Index_type k) {
+            std::for_each(beginK, endK, [=,&dot](Index_type k) {
                POLYBENCH_GEMM_BODY3;
             });
             POLYBENCH_GEMM_BODY4;
@@ -87,30 +114,22 @@ void POLYBENCH_GEMM::runStdParVariant(VariantID vid)
                                    POLYBENCH_GEMM_BODY4;
                                   };
 
-#ifdef USE_STDPAR_COLLAPSE
-      auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-#else
-      auto rangeI = std::views::iota((Index_type)0, ni);
-      auto rangeJ = std::views::iota((Index_type)0, nj);
-#endif
-      auto rangeK = std::views::iota((Index_type)0, nk);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeIJ), std::end(rangeIJ), [=](Index_type ij) {
+                       beginIJ, endIJ, [=](Index_type ij) {
             const auto i  = ij / nj;
             const auto j  = ij % nj;
 #else
         std::for_each( std::execution::par_unseq,
-                       std::begin(rangeI), std::end(rangeI), [=](Index_type i) {
-          std::for_each( std::begin(rangeJ), std::end(rangeJ), [=](Index_type j) {
+                       beginI, endI, [=](Index_type i) {
+          std::for_each(beginJ, endJ, [=](Index_type j) {
 #endif
             POLYBENCH_GEMM_BODY1;
             poly_gemm_base_lam2(i, j);
-            std::for_each( std::begin(rangeK), std::end(rangeK), [=,&dot](Index_type k) {
+            std::for_each(beginK, endK, [=,&dot](Index_type k) {
               poly_gemm_base_lam3(i, j, k, dot);
             });
             poly_gemm_base_lam4(i, j, dot);

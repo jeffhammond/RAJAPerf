@@ -10,7 +10,6 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
 #include <algorithm>
 #include <execution>
 

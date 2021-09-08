@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -30,20 +35,27 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+#ifdef USE_RANGES
+      auto range = std::views::iota(ibegin, iend);
+      auto begin = std::begin(range);
+      auto end   = std::end(range);
+#else
+      thrust::counting_iterator<Index_type> begin(ibegin);
+      thrust::counting_iterator<Index_type> end(iend);
+#endif
+
   PI_REDUCE_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         Real_type pi = m_pi_init;
         pi += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
+                                     begin, end,
                                       0.0, std::plus<>(),
                         [=](Index_type i) {
           double x = (double(i) + 0.5) * dx;
@@ -64,15 +76,13 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
                                  return dx / (1.0 + x * x);
                                };
 
-      auto range = std::views::iota(ibegin, iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         Real_type pi = m_pi_init;
 
         pi += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
+                                     begin, end,
                                       0.0, std::plus<>(), pireduce_base_lam);
 
         m_pi = 4.0 * pi;
