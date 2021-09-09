@@ -26,7 +26,6 @@ namespace rajaperf
 namespace polybench
 {
 
-
 void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
 {
 #if defined(RUN_STDPAR)
@@ -37,6 +36,8 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
 
 #ifdef USE_RANGES
   auto range = std::views::iota((Index_type)1,N-1);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
 #else
   thrust::counting_iterator<Index_type> begin(1);
   thrust::counting_iterator<Index_type> end(N-1);
