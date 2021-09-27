@@ -54,12 +54,16 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::atomic<double> a_pi{m_pi_init};
-        std::for_each( std::execution::par_unseq,
+        //double a_pi{m_pi_init};
+//#pragma acc enter data copyin(a_pi)
+        std::for_each( //std::execution::par_unseq,
                        begin, end,
                        [=,&a_pi](Index_type i) {
           double x = (double(i) + 0.5) * dx;
+          //#pragma acc atomic
           a_pi += dx / (1.0 + x * x);
         });
+//#pragma acc exit data copyout(a_pi)
         *pi = a_pi * 4.0;
 
       }
@@ -71,7 +75,9 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
     case Lambda_StdPar : {
 
       auto piatomic_base_lam = [=](Index_type i, std::atomic<double> &a_pi) {
+      //auto piatomic_base_lam = [=](Index_type i, double &a_pi) {
                                  double x = (double(i) + 0.5) * dx;
+                                 //#pragma acc atomic
                                  a_pi += dx / (1.0 + x * x);
                                };
 
@@ -79,9 +85,12 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::atomic<double> a_pi{m_pi_init};
+        //double a_pi{m_pi_init};
+//#pragma acc enter data copyin(a_pi)
         for (Index_type i = ibegin; i < iend; ++i ) {
           piatomic_base_lam(i,a_pi);
         }
+//#pragma acc exit data copyout(a_pi)
         *pi = a_pi * 4.0;
 
       }
