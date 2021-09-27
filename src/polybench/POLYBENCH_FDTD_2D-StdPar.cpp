@@ -127,26 +127,26 @@ void POLYBENCH_FDTD_2D::runStdParVariant(VariantID vid)
 
         for (t = 0; t < tsteps; ++t) {
 
-          std::for_each( std::execution::par_unseq,
+          std::for_each( //std::execution::par_unseq,
                          beginY, endY,
                          [=](Index_type j) {
             poly_fdtd2d_base_lam1(j);
           });
-          std::for_each( std::execution::par_unseq,
+          std::for_each( //std::execution::par_unseq,
                          begin1X, end1X,
                          [=](Index_type i) {
             for (Index_type j = 0; j < ny; j++) {
               poly_fdtd2d_base_lam2(i, j);
             }
           });
-          std::for_each( std::execution::par_unseq,
+          std::for_each( //std::execution::par_unseq,
                          beginX, endX,
                          [=](Index_type i) {
             for (Index_type j = 1; j < ny; j++) {
               poly_fdtd2d_base_lam3(i, j);
             }
           });
-          std::for_each( std::execution::par_unseq,
+          std::for_each( //std::execution::par_unseq,
                          beginXm1, endXm1,
                          [=](Index_type i) {
             for (Index_type j = 0; j < ny - 1; j++) {
