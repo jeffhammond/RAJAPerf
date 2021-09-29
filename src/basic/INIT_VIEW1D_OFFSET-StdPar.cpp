@@ -42,7 +42,7 @@ void INIT_VIEW1D_OFFSET::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           INIT_VIEW1D_OFFSET_BODY;
         });
@@ -65,7 +65,7 @@ void INIT_VIEW1D_OFFSET::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           initview1doffset_base_lam(i);
         });

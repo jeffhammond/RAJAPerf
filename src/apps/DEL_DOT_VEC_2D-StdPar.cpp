@@ -51,7 +51,7 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type ii) {
           DEL_DOT_VEC_2D_BODY_INDEX;
           DEL_DOT_VEC_2D_BODY;
@@ -76,7 +76,7 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type ii) {
           deldotvec2d_base_lam(ii);
         });

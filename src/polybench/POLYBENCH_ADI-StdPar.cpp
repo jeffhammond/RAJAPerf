@@ -41,7 +41,7 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
         for (Index_type t = 1; t <= tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             POLYBENCH_ADI_BODY2;
             for (Index_type j = 1; j < n-1; ++j) {
@@ -54,7 +54,7 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
           });
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             POLYBENCH_ADI_BODY6;
             for (Index_type j = 1; j < n-1; ++j) {
@@ -109,7 +109,7 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
         for (Index_type t = 1; t <= tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             poly_adi_base_lam2(i);
             for (Index_type j = 1; j < n-1; ++j) {
@@ -122,7 +122,7 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
           });
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             poly_adi_base_lam6(i);
             for (Index_type j = 1; j < n-1; ++j) {
