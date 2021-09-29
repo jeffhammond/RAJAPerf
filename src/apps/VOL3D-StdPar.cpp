@@ -12,7 +12,7 @@
 
 #include "AppsData.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
