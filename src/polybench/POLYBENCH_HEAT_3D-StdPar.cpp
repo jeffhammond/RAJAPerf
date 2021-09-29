@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -29,11 +34,18 @@ void POLYBENCH_HEAT_3D::runStdParVariant(VariantID vid)
 
   POLYBENCH_HEAT_3D_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)1,N-1);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(1);
+  thrust::counting_iterator<Index_type> end(N-1);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)1,N-1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -41,28 +53,28 @@ void POLYBENCH_HEAT_3D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            begin, end,
-                            [=](Index_type j) {
+                           begin, end,
+                           [=](Index_type j) {
               std::for_each( std::execution::unseq,
-                            begin, end,
-                            [=](Index_type k) {
+                           begin, end,
+                           [=](Index_type k) {
                 POLYBENCH_HEAT_3D_BODY1;
               });
             });
           });
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            begin, end,
-                            [=](Index_type j) {
+                           begin, end,
+                           [=](Index_type j) {
               std::for_each( std::execution::unseq,
-                            begin, end,
-                            [=](Index_type k) {
+                           begin, end,
+                           [=](Index_type k) {
                 POLYBENCH_HEAT_3D_BODY2;
               });
             });

@@ -140,8 +140,6 @@ void POLYBENCH_FLOYD_WARSHALL::runOpenMPVariant(VariantID vid)
 
   }
 
-#else 
-  RAJA_UNUSED_VAR(vid);
 #endif
 }
 

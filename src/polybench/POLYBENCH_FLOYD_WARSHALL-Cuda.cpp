@@ -19,21 +19,6 @@ namespace rajaperf
 namespace polybench
 {
 
-//
-// Define thread block size for CUDA execution
-//
-constexpr size_t i_block_sz = 8;
-constexpr size_t j_block_sz = 32;
-
-#define POLY_FLOYD_WARSHALL_THREADS_PER_BLOCK_CUDA \
-  dim3 nthreads_per_block(j_block_sz, i_block_sz, 1);
-
-#define POLY_FLOYD_WARSHALL_NBLOCKS_CUDA \
-  dim3 nblocks(static_cast<size_t>(RAJA_DIVIDE_CEILING_INT(N, j_block_sz)), \
-               static_cast<size_t>(RAJA_DIVIDE_CEILING_INT(N, i_block_sz)), \
-               static_cast<size_t>(1));
-
-
 #define POLYBENCH_FLOYD_WARSHALL_DATA_SETUP_CUDA \
   allocAndInitCudaDeviceData(pin, m_pin, m_N * m_N); \
   allocAndInitCudaDeviceData(pout, m_pout, m_N * m_N);
@@ -49,24 +34,10 @@ __global__ void poly_floyd_warshall(Real_ptr pout, Real_ptr pin,
                                     Index_type k,
                                     Index_type N)
 {
-  Index_type i = blockIdx.y * blockDim.y + threadIdx.y;
-  Index_type j = blockIdx.x * blockDim.x + threadIdx.x;
+   Index_type i = blockIdx.y;
+   Index_type j = threadIdx.x;
 
-  if ( i < N && j < N ) { 
-    POLYBENCH_FLOYD_WARSHALL_BODY;
-  }
-}
-
-template< typename Lambda >
-__global__ void poly_floyd_warshall_lam(Index_type N, 
-                                        Lambda body)
-{
-  Index_type i = blockIdx.y * blockDim.y + threadIdx.y;
-  Index_type j = blockIdx.x * blockDim.x + threadIdx.x;
-
-  if ( i < N && j < N ) {
-    body(i, j);
-  }
+   POLYBENCH_FLOYD_WARSHALL_BODY;
 }
 
 
@@ -85,11 +56,10 @@ void POLYBENCH_FLOYD_WARSHALL::runCudaVariant(VariantID vid)
 
       for (Index_type k = 0; k < N; ++k) {
 
-        POLY_FLOYD_WARSHALL_THREADS_PER_BLOCK_CUDA;
-        POLY_FLOYD_WARSHALL_NBLOCKS_CUDA;
-   
-        poly_floyd_warshall<<<nblocks, nthreads_per_block>>>(pout, pin,
-                                                             k, N);
+        dim3 nblocks1(1, N, 1);
+        dim3 nthreads_per_block1(N, 1, 1);
+        poly_floyd_warshall<<<nblocks1, nthreads_per_block1>>>(pout, pin,
+                                                               k, N);
         cudaErrchk( cudaGetLastError() );
 
       }
@@ -108,14 +78,15 @@ void POLYBENCH_FLOYD_WARSHALL::runCudaVariant(VariantID vid)
 
       for (Index_type k = 0; k < N; ++k) {
 
-        POLY_FLOYD_WARSHALL_THREADS_PER_BLOCK_CUDA;
-        POLY_FLOYD_WARSHALL_NBLOCKS_CUDA;
-
-        poly_floyd_warshall_lam<<<nblocks, nthreads_per_block>>>(N,
+        dim3 nblocks1(1, N, 1);
+        dim3 nthreads_per_block1(N, 1, 1);
+        lambda_cuda_kernel<RAJA::cuda_block_y_direct, RAJA::cuda_thread_x_direct>
+                          <<<nblocks1, nthreads_per_block1>>>(
+          0, N, 0, N,
           [=] __device__ (Index_type i, Index_type j) {
-            POLYBENCH_FLOYD_WARSHALL_BODY;
-          }
-        );
+
+          POLYBENCH_FLOYD_WARSHALL_BODY;
+        });
 
       }
 
@@ -133,16 +104,10 @@ void POLYBENCH_FLOYD_WARSHALL::runCudaVariant(VariantID vid)
     using EXEC_POL =
       RAJA::KernelPolicy<
         RAJA::statement::For<0, RAJA::seq_exec,
-          RAJA::statement::CudaKernelFixedAsync<i_block_sz * j_block_sz,
-            RAJA::statement::Tile<1, RAJA::tile_fixed<i_block_sz>,
-                                     RAJA::cuda_block_y_direct,
-              RAJA::statement::Tile<2, RAJA::tile_fixed<j_block_sz>,
-                                       RAJA::cuda_block_x_direct,
-                RAJA::statement::For<1, RAJA::cuda_thread_y_direct,   // i
-                  RAJA::statement::For<2, RAJA::cuda_thread_x_direct, // j
-                    RAJA::statement::Lambda<0>
-                  >
-                >
+          RAJA::statement::CudaKernelAsync<
+            RAJA::statement::For<1, RAJA::cuda_block_y_direct,
+              RAJA::statement::For<2, RAJA::cuda_thread_x_direct,
+                RAJA::statement::Lambda<0>
               >
             >
           >

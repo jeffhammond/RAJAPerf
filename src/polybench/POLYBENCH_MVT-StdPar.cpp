@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -28,34 +33,41 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
 
   POLYBENCH_MVT_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)0,N);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(0);
+  thrust::counting_iterator<Index_type> end(N);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)0,N);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type i) {
+                       begin, end,
+                       [=](Index_type i) {
           POLYBENCH_MVT_BODY1;
           std::for_each( std::execution::unseq,
-                          begin, end,
-                          [=,&dot](Index_type j) {
+                         begin, end,
+                         [=,&dot](Index_type j) {
             POLYBENCH_MVT_BODY2;
           });
           POLYBENCH_MVT_BODY3;
         });
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
+                       begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY4;
           std::for_each( std::execution::unseq,
-                          begin, end,
-                          [=,&dot](Index_type j) {
+                         begin, end,
+                         [=,&dot](Index_type j) {
             POLYBENCH_MVT_BODY5;
           });
           POLYBENCH_MVT_BODY6;
@@ -86,30 +98,28 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
                                   POLYBENCH_MVT_BODY6;
                                 };
 
-      auto range = std::views::iota((Index_type)0,N);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
+                       begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY1;
           std::for_each( std::execution::unseq,
-                          begin, end,
-                          [=,&dot](Index_type j) {
+                         begin, end,
+                         [=,&dot](Index_type j) {
             poly_mvt_base_lam2(i, j, dot);
           });
           poly_mvt_base_lam3(i, dot);
         });
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
+                       begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY4;
           std::for_each( std::execution::unseq,
-                          begin, end,
-                          [=,&dot](Index_type j) {
+                         begin, end,
+                         [=,&dot](Index_type j) {
             poly_mvt_base_lam5(i, j, dot);
           });
           poly_mvt_base_lam6(i, dot);

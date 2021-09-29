@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -31,40 +36,47 @@ void POLYBENCH_GEMVER::runStdParVariant(VariantID vid)
 
   POLYBENCH_GEMVER_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)0, n);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(0);
+  thrust::counting_iterator<Index_type> end(n);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)0, n);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
-          std::for_each( begin, end, [=](Index_type j) {
+                      begin, end, [=](Index_type i) {
+          std::for_each(begin, end, [=](Index_type j) {
             POLYBENCH_GEMVER_BODY1;
           });
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           POLYBENCH_GEMVER_BODY2;
-          std::for_each( begin, end, [=,&dot](Index_type j) {
+          std::for_each(begin, end, [=,&dot](Index_type j) {
             POLYBENCH_GEMVER_BODY3;
           });
           POLYBENCH_GEMVER_BODY4;
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           POLYBENCH_GEMVER_BODY5;
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           POLYBENCH_GEMVER_BODY6;
-          std::for_each( begin, end, [=,&dot](Index_type j) {
+          std::for_each(begin, end, [=,&dot](Index_type j) {
             POLYBENCH_GEMVER_BODY7;
           });
           POLYBENCH_GEMVER_BODY8;
@@ -99,36 +111,34 @@ void POLYBENCH_GEMVER::runStdParVariant(VariantID vid)
                                      POLYBENCH_GEMVER_BODY8;
                                    };
 
-      auto range = std::views::iota((Index_type)0, n);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
-          std::for_each( begin, end, [=](Index_type j) {
+                      begin, end, [=](Index_type i) {
+          std::for_each(begin, end, [=](Index_type j) {
             poly_gemver_base_lam1(i, j);
           });
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           POLYBENCH_GEMVER_BODY2;
-          std::for_each( begin, end, [=,&dot](Index_type j) {
+          std::for_each(begin, end, [=,&dot](Index_type j) {
             poly_gemver_base_lam3(i, j, dot);
           });
           poly_gemver_base_lam4(i, dot);
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           poly_gemver_base_lam5(i);
         });
 
         std::for_each( std::execution::par_unseq,
-                       begin, end, [=](Index_type i) {
+                      begin, end, [=](Index_type i) {
           POLYBENCH_GEMVER_BODY6;
-          std::for_each( begin, end, [=,&dot](Index_type j) {
+          std::for_each(begin, end, [=,&dot](Index_type j) {
             poly_gemver_base_lam7(i, j, dot);
           });
           poly_gemver_base_lam8(i, dot);
