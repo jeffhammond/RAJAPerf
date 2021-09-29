@@ -10,9 +10,9 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
 #include <algorithm>
 #include <execution>
+#include "common/StdParUtils.hpp"
 
 #include <iostream>
 
@@ -40,14 +40,15 @@ void TRIAD::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
+      auto begin = counting_iterator<Index_type>(ibegin);
+      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin,end,
+                       [=](Index_type i) {
           TRIAD_BODY;
         });
 
@@ -59,14 +60,15 @@ void TRIAD::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
+      auto begin = counting_iterator<Index_type>(ibegin);
+      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
-                        [=](Index_type i) {
+                       begin,end,
+                       [=](Index_type i) {
           triad_lam(i);
         });
       }
