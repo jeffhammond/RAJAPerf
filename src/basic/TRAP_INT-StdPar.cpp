@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <numeric>
 #include <execution>
