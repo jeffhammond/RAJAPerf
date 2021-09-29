@@ -10,10 +10,10 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
 #include <algorithm>
 #include <numeric>
 #include <execution>
+#include "common/StdParUtils.hpp"
 
 #include <iostream>
 
@@ -59,7 +59,8 @@ void DOT::runStdParVariant(VariantID vid)
                             return a[i] * b[i];
                           };
 
-      auto range = std::views::iota(ibegin, iend);
+      auto begin = counting_iterator<Index_type>(ibegin);
+      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -67,7 +68,7 @@ void DOT::runStdParVariant(VariantID vid)
         Real_type dot = m_dot_init;
 
         dot += std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
+                                      begin,end,
                                       (Real_type)0,
                                       std::plus<Real_type>(),
                                       dot_base_lam);
