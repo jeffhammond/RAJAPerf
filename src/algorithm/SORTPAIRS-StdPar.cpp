@@ -31,14 +31,14 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   SORTPAIRS_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -52,16 +52,16 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
           vector_of_pairs.emplace_back(x[iend*irep + iemp], i[iend*irep + iemp]);
         }
 
-        std::sort(std::execution::par_unseq,
-                  vector_of_pairs.begin(), vector_of_pairs.end(),
+        std::sort( std::execution::par_unseq,
+                   vector_of_pairs.begin(), vector_of_pairs.end(),
             [](pair_type const& lhs, pair_type const& rhs) {
               return lhs.first < rhs.first;
             });
 
         //for (Index_type iemp = ibegin; iemp < iend; ++iemp) {
-        std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type iemp) {
+        std::for_each( //std::execution::par_unseq,
+                       begin, end,
+                       [=](Index_type iemp) {
           const pair_type& pair = vector_of_pairs[iemp - ibegin];
           x[iend*irep + iemp] = pair.first;
           i[iend*irep + iemp] = pair.second;
