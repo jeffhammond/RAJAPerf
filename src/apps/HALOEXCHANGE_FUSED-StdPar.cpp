@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -54,7 +54,8 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
           }
         }
 
-        auto range = std::views::iota((Index_type)0,pack_index);
+        auto begin = counting_iterator<Index_type>(0);
+        auto end   = counting_iterator<Index_type>(pack_index);
         std::for_each( std::execution::par_unseq,
                         begin, end,
                         [=](Index_type j) {
@@ -82,10 +83,11 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
           }
         }
 
-        auto range2 = std::views::iota((Index_type)0,unpack_index);
+        auto begin2 = counting_iterator<Index_type>(0);
+        auto end2   = counting_iterator<Index_type>(unpack_index);
         std::for_each( std::execution::par_unseq,
-                        std::begin(range2), std::end(range2),
-                        [=](Index_type j) {
+                       begin2, end2,
+                       [=](Index_type j) {
           Real_ptr   buffer = unpack_ptr_holders[j].buffer;
           Int_ptr    list   = unpack_ptr_holders[j].list;
           Real_ptr   var    = unpack_ptr_holders[j].var;
@@ -124,7 +126,8 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
             buffer += len;
           }
         }
-        auto range = std::views::iota((Index_type)0,pack_index);
+        auto begin = counting_iterator<Index_type>(0);
+        auto end   = counting_iterator<Index_type>(pack_index);
         std::for_each( std::execution::par_unseq,
                         begin, end,
                         [=](Index_type j) {
