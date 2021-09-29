@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -41,22 +41,24 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto rangeK = std::views::iota((Index_type)0,N);
-      auto rangeI = std::views::iota((Index_type)1,N+1);
+      auto beginK = counting_iterator<Index_type>(0);
+      auto endK   = counting_iterator<Index_type>(N);
+      auto beginI = counting_iterator<Index_type>(1);
+      auto endI   = counting_iterator<Index_type>(N+1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         //for (Index_type k = 0; k < N; ++k ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           GEN_LIN_RECUR_BODY1;
         });
 
         //for (Index_type i = 1; i < N+1; ++i ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeI), std::end(rangeI),
+                        beginI, endI,
                         [=](Index_type i) {
           GEN_LIN_RECUR_BODY2;
         });
@@ -69,22 +71,24 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto rangeK = std::views::iota((Index_type)0,N);
-      auto rangeI = std::views::iota((Index_type)1,N+1);
+      auto beginK = counting_iterator<Index_type>(0);
+      auto endK   = counting_iterator<Index_type>(N);
+      auto beginI = counting_iterator<Index_type>(1);
+      auto endI   = counting_iterator<Index_type>(N+1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         //for (Index_type k = 0; k < N; ++k ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           genlinrecur_lam1(k);
         });
 
         //for (Index_type i = 1; i < N+1; ++i ) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(rangeI), std::end(rangeI),
+                        beginI, endI,
                         [=](Index_type i) {
           genlinrecur_lam2(i);
         });

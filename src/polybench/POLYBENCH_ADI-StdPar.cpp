@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -29,11 +34,18 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
 
   POLYBENCH_ADI_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto range = std::views::iota((Index_type)1,n-1);
+  auto begin = std::begin(range);
+  auto end   = std::end(range);
+#else
+  thrust::counting_iterator<Index_type> begin(1);
+  thrust::counting_iterator<Index_type> end(n-1);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto range = std::views::iota((Index_type)1,n-1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -41,8 +53,8 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
         for (Index_type t = 1; t <= tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             POLYBENCH_ADI_BODY2;
             for (Index_type j = 1; j < n-1; ++j) {
               POLYBENCH_ADI_BODY3;
@@ -54,8 +66,8 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
           });
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
-                          [=](Index_type i) {
+                         begin, end,
+                         [=](Index_type i) {
             POLYBENCH_ADI_BODY6;
             for (Index_type j = 1; j < n-1; ++j) {
               POLYBENCH_ADI_BODY7;
@@ -101,15 +113,13 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
                                   POLYBENCH_ADI_BODY9;
                                 };
 
-      auto range = std::views::iota((Index_type)1,n-1);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         for (Index_type t = 1; t <= tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
+                         begin, end,
                           [=](Index_type i) {
             poly_adi_base_lam2(i);
             for (Index_type j = 1; j < n-1; ++j) {
@@ -122,7 +132,7 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
           });
 
           std::for_each( std::execution::par_unseq,
-                          begin, end,
+                         begin, end,
                           [=](Index_type i) {
             poly_adi_base_lam6(i);
             for (Index_type j = 1; j < n-1; ++j) {

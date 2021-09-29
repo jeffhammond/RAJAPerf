@@ -10,7 +10,12 @@
 
 #include "RAJA/RAJA.hpp"
 
+#ifdef USE_RANGES
 #include <ranges>
+#else
+#include <thrust/iterator/counting_iterator.h>
+#endif
+
 #include <algorithm>
 #include <execution>
 
@@ -29,16 +34,33 @@ void POLYBENCH_FDTD_2D::runStdParVariant(VariantID vid)
 
   POLYBENCH_FDTD_2D_DATA_SETUP;
 
+#ifdef USE_RANGES
+  auto rangeX = std::views::iota((Index_type)0,nx);
+  auto beginX = std::begin(rangeX);
+  auto endX   = std::end(rangeX);
+  auto rangeY = std::views::iota((Index_type)0,ny);
+  auto beginY = std::begin(rangeY);
+  auto endY   = std::end(rangeY);
+  auto range1X = std::views::iota((Index_type)1,nx);
+  auto begin1X = std::begin(range1X);
+  auto end1X   = std::end(range1X);
+  auto rangeXm1 = std::views::iota((Index_type)0,nx-1);
+  auto beginXm1 = std::begin(rangeXm1);
+  auto endXm1   = std::end(rangeXm1);
+#else
+  thrust::counting_iterator<Index_type> beginX(0);
+  thrust::counting_iterator<Index_type> endX(nx);
+  thrust::counting_iterator<Index_type> beginY(0);
+  thrust::counting_iterator<Index_type> endY(ny);
+  thrust::counting_iterator<Index_type> begin1X(1);
+  thrust::counting_iterator<Index_type> end1X(nx);
+  thrust::counting_iterator<Index_type> beginXm1(0);
+  thrust::counting_iterator<Index_type> endXm1(nx-1);
+#endif
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto rangeX = std::views::iota((Index_type)0,nx);
-      auto rangeY = std::views::iota((Index_type)0,ny);
-      auto range1X = std::views::iota((Index_type)1,nx);
-      //auto range1Y = std::views::iota((Index_type)1,ny);
-      auto rangeXm1 = std::views::iota((Index_type)0,nx-1);
-      //auto rangeYm1 = std::views::iota((Index_type)0,ny-1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -46,27 +68,27 @@ void POLYBENCH_FDTD_2D::runStdParVariant(VariantID vid)
         for (t = 0; t < tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(rangeY), std::end(rangeY),
-                          [=](Index_type j) {
+                         beginY, endY,
+                         [=](Index_type j) {
             POLYBENCH_FDTD_2D_BODY1;
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range1X), std::end(range1X),
-                          [=](Index_type i) {
+                         begin1X, end1X,
+                         [=](Index_type i) {
             for (Index_type j = 0; j < ny; j++) {
               POLYBENCH_FDTD_2D_BODY2;
             }
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(rangeX), std::end(rangeX),
-                          [=](Index_type i) {
+                         beginX, endX,
+                         [=](Index_type i) {
             for (Index_type j = 1; j < ny; j++) {
               POLYBENCH_FDTD_2D_BODY3;
             }
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(rangeXm1), std::end(rangeXm1),
-                          [=](Index_type i) {
+                         beginXm1, endXm1,
+                         [=](Index_type i) {
             for (Index_type j = 0; j < ny - 1; j++) {
               POLYBENCH_FDTD_2D_BODY4;
             }
@@ -100,40 +122,33 @@ void POLYBENCH_FDTD_2D::runStdParVariant(VariantID vid)
                                      POLYBENCH_FDTD_2D_BODY4;
                                    };
 
-      auto rangeX = std::views::iota((Index_type)0,nx);
-      auto rangeY = std::views::iota((Index_type)0,ny);
-      auto range1X = std::views::iota((Index_type)1,nx);
-      //auto range1Y = std::views::iota((Index_type)1,ny);
-      auto rangeXm1 = std::views::iota((Index_type)0,nx-1);
-      //auto rangeYm1 = std::views::iota((Index_type)0,ny-1);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         for (t = 0; t < tsteps; ++t) {
 
-          std::for_each( std::execution::par_unseq,
-                          std::begin(rangeY), std::end(rangeY),
-                          [=](Index_type j) {
+          std::for_each( //std::execution::par_unseq,
+                         beginY, endY,
+                         [=](Index_type j) {
             poly_fdtd2d_base_lam1(j);
           });
-          std::for_each( std::execution::par_unseq,
-                          std::begin(range1X), std::end(range1X),
-                          [=](Index_type i) {
+          std::for_each( //std::execution::par_unseq,
+                         begin1X, end1X,
+                         [=](Index_type i) {
             for (Index_type j = 0; j < ny; j++) {
               poly_fdtd2d_base_lam2(i, j);
             }
           });
-          std::for_each( std::execution::par_unseq,
-                          std::begin(rangeX), std::end(rangeX),
-                          [=](Index_type i) {
+          std::for_each( //std::execution::par_unseq,
+                         beginX, endX,
+                         [=](Index_type i) {
             for (Index_type j = 1; j < ny; j++) {
               poly_fdtd2d_base_lam3(i, j);
             }
           });
-          std::for_each( std::execution::par_unseq,
-                          std::begin(rangeXm1), std::end(rangeXm1),
-                          [=](Index_type i) {
+          std::for_each( //std::execution::par_unseq,
+                         beginXm1, endXm1,
+                         [=](Index_type i) {
             for (Index_type j = 0; j < ny - 1; j++) {
               poly_fdtd2d_base_lam4(i, j);
             }

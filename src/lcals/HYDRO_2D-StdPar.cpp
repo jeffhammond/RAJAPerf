@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -38,37 +38,39 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto rangeK = std::views::iota(kbeg, kend);
-      auto rangeJ = std::views::iota(jbeg, jend);
+      auto beginK = counting_iterator<Index_type>(kbeg);
+      auto endK   = counting_iterator<Index_type>(kend);
+      auto beginJ = counting_iterator<Index_type>(jbeg);
+      auto endJ   = counting_iterator<Index_type>(jend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY1;
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY2;
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             HYDRO_2D_BODY3;
           });
@@ -92,37 +94,39 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
                                  HYDRO_2D_BODY3;
                                };
 
-      auto rangeK = std::views::iota(kbeg, kend);
-      auto rangeJ = std::views::iota(jbeg, jend);
+      auto beginK = counting_iterator<Index_type>(kbeg);
+      auto endK   = counting_iterator<Index_type>(kend);
+      auto beginJ = counting_iterator<Index_type>(jbeg);
+      auto endJ   = counting_iterator<Index_type>(jend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam1(k, j);
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam2(k, j);
           });
         });
 
         std::for_each( std::execution::par,
-                        std::begin(rangeK), std::end(rangeK),
+                        beginK, endK,
                         [=](Index_type k) {
           std::for_each( std::execution::unseq,
-                        std::begin(rangeJ), std::end(rangeJ),
+                        beginJ, endJ,
                         [=](Index_type j) {
             hydro2d_base_lam3(k, j);
           });

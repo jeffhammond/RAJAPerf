@@ -21,21 +21,6 @@ namespace rajaperf
 namespace polybench
 {
 
-  //
-  // Define thread block size for CUDA execution
-  //
-  constexpr size_t i_block_sz = 8;
-  constexpr size_t j_block_sz = 32;
-
-#define JACOBI_2D_THREADS_PER_BLOCK_CUDA \
-  dim3 nthreads_per_block(j_block_sz, i_block_sz, 1);
-
-#define JACOBI_2D_NBLOCKS_CUDA \
-  dim3 nblocks(static_cast<size_t>(RAJA_DIVIDE_CEILING_INT(N-2, j_block_sz)), \
-               static_cast<size_t>(RAJA_DIVIDE_CEILING_INT(N-2, i_block_sz)), \
-               static_cast<size_t>(1));
-
-
 #define POLYBENCH_JACOBI_2D_DATA_SETUP_CUDA \
   allocAndInitCudaDeviceData(A, m_Ainit, m_N*m_N); \
   allocAndInitCudaDeviceData(B, m_Binit, m_N*m_N);
@@ -50,8 +35,8 @@ namespace polybench
 
 __global__ void poly_jacobi_2D_1(Real_ptr A, Real_ptr B, Index_type N)
 {
-  Index_type i = 1 + blockIdx.y * blockDim.y + threadIdx.y;
-  Index_type j = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = 1 + blockIdx.y;
+  Index_type j = 1 + threadIdx.x;
 
   if ( i < N-1 && j < N-1 ) {
     POLYBENCH_JACOBI_2D_BODY1;
@@ -60,23 +45,12 @@ __global__ void poly_jacobi_2D_1(Real_ptr A, Real_ptr B, Index_type N)
 
 __global__ void poly_jacobi_2D_2(Real_ptr A, Real_ptr B, Index_type N)
 {
-  Index_type i = 1 + blockIdx.y * blockDim.y + threadIdx.y;
-  Index_type j = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+   Index_type i = 1 + blockIdx.y;
+   Index_type j = 1 + threadIdx.x;
 
-  if ( i < N-1 && j < N-1 ) {
-    POLYBENCH_JACOBI_2D_BODY2;
-  }
-}
-
-template< typename Lambda >
-__global__ void poly_jacobi_2D_lam(Index_type N, Lambda body)
-{
-  Index_type i = 1 + blockIdx.y * blockDim.y + threadIdx.y;
-  Index_type j = 1 + blockIdx.x * blockDim.x + threadIdx.x;
-
-  if ( i < N-1 && j < N-1 ) {
-    body(i, j);
-  }
+   if ( i < N-1 && j < N-1 ) {
+     POLYBENCH_JACOBI_2D_BODY2;
+   }
 }
 
 
@@ -95,8 +69,8 @@ void POLYBENCH_JACOBI_2D::runCudaVariant(VariantID vid)
 
       for (Index_type t = 0; t < tsteps; ++t) {
 
-        JACOBI_2D_THREADS_PER_BLOCK_CUDA;
-        JACOBI_2D_NBLOCKS_CUDA;
+        dim3 nblocks(1, N-2, 1);
+        dim3 nthreads_per_block(N-2, 1, 1);
 
         poly_jacobi_2D_1<<<nblocks, nthreads_per_block>>>(A, B, N);
         cudaErrchk( cudaGetLastError() );
@@ -120,21 +94,25 @@ void POLYBENCH_JACOBI_2D::runCudaVariant(VariantID vid)
 
       for (Index_type t = 0; t < tsteps; ++t) {
 
-        JACOBI_2D_THREADS_PER_BLOCK_CUDA;
-        JACOBI_2D_NBLOCKS_CUDA;
+        dim3 nblocks(1, N-2, 1);
+        dim3 nthreads_per_block(N-2, 1, 1);
 
-        poly_jacobi_2D_lam<<<nblocks, nthreads_per_block>>>(N,
+        lambda_cuda_kernel<RAJA::cuda_block_y_direct, RAJA::cuda_thread_x_direct>
+                          <<<nblocks, nthreads_per_block>>>(
+          1, N-1, 1, N-1,
           [=] __device__ (Index_type i, Index_type j) {
-            POLYBENCH_JACOBI_2D_BODY1;
-          }
-        );
+
+          POLYBENCH_JACOBI_2D_BODY1;
+        });
         cudaErrchk( cudaGetLastError() );
 
-        poly_jacobi_2D_lam<<<nblocks, nthreads_per_block>>>(N,
+        lambda_cuda_kernel<RAJA::cuda_block_y_direct, RAJA::cuda_thread_x_direct>
+                          <<<nblocks, nthreads_per_block>>>(
+          1, N-1, 1, N-1,
           [=] __device__ (Index_type i, Index_type j) {
-            POLYBENCH_JACOBI_2D_BODY2;
-          }
-        );
+
+          POLYBENCH_JACOBI_2D_BODY2;
+        });
         cudaErrchk( cudaGetLastError() );
 
       }
@@ -152,35 +130,32 @@ void POLYBENCH_JACOBI_2D::runCudaVariant(VariantID vid)
 
     using EXEC_POL =
       RAJA::KernelPolicy<
-        RAJA::statement::CudaKernelFixedAsync<i_block_sz * j_block_sz,
-          RAJA::statement::Tile<0, RAJA::tile_fixed<i_block_sz>,
-                                   RAJA::cuda_block_y_direct,
-            RAJA::statement::Tile<1, RAJA::tile_fixed<j_block_sz>,
-                                     RAJA::cuda_block_x_direct,
-              RAJA::statement::For<0, RAJA::cuda_thread_y_direct,   // i
-                RAJA::statement::For<1, RAJA::cuda_thread_x_direct, // j
-                  RAJA::statement::Lambda<0>
-                >
-              >
+        RAJA::statement::CudaKernelAsync<
+          RAJA::statement::For<0, RAJA::cuda_block_y_direct,
+            RAJA::statement::For<1, RAJA::cuda_thread_x_direct,
+              RAJA::statement::Lambda<0>
+            >
+          >
+        >,
+        RAJA::statement::CudaKernelAsync<
+          RAJA::statement::For<0, RAJA::cuda_block_y_direct,
+            RAJA::statement::For<1, RAJA::cuda_thread_x_direct,
+              RAJA::statement::Lambda<1>
             >
           >
         >
-      >;        
+      >;
 
     startTimer();
     for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
       for (Index_type t = 0; t < tsteps; ++t) {
 
-        RAJA::kernel<EXEC_POL>(RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
-                                                RAJA::RangeSegment{1, N-1}),
+        RAJA::kernel<EXEC_POL>( RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
+                                                 RAJA::RangeSegment{1, N-1}),
           [=] __device__ (Index_type i, Index_type j) {
             POLYBENCH_JACOBI_2D_BODY1_RAJA;
-          }
-        );
-
-         RAJA::kernel<EXEC_POL>(RAJA::make_tuple(RAJA::RangeSegment{1, N-1},
-                                                 RAJA::RangeSegment{1, N-1}),
+          },
           [=] __device__ (Index_type i, Index_type j) {
             POLYBENCH_JACOBI_2D_BODY2_RAJA;
           }
