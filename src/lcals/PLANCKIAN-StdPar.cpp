@@ -41,7 +41,8 @@ void PLANCKIAN::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
+      auto begin = counting_iterator<Index_type>(ibegin);
+      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -60,7 +61,8 @@ void PLANCKIAN::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto range = std::views::iota(ibegin, iend);
+      auto begin = counting_iterator<Index_type>(ibegin);
+      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
