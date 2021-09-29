@@ -10,9 +10,9 @@
 
 #include "RAJA/RAJA.hpp"
 
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
-#include "common/StdParUtils.hpp"
 
 #include <iostream>
 
@@ -30,6 +30,9 @@ void ADD::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   ADD_DATA_SETUP;
 
   auto add_lam = [=](Index_type i) {
@@ -39,9 +42,6 @@ void ADD::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -59,9 +59,6 @@ void ADD::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

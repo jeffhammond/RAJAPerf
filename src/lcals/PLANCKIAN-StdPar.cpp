@@ -31,6 +31,9 @@ void PLANCKIAN::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   PLANCKIAN_DATA_SETUP;
 
   auto planckian_lam = [=](Index_type i) {
@@ -40,9 +43,6 @@ void PLANCKIAN::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -60,9 +60,6 @@ void PLANCKIAN::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

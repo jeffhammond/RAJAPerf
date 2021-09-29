@@ -10,12 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -34,29 +29,14 @@ void POLYBENCH_FDTD_2D::runStdParVariant(VariantID vid)
 
   POLYBENCH_FDTD_2D_DATA_SETUP;
 
-#ifdef USE_RANGES
-  auto rangeX = std::views::iota((Index_type)0,nx);
-  auto beginX = std::begin(rangeX);
-  auto endX   = std::end(rangeX);
-  auto rangeY = std::views::iota((Index_type)0,ny);
-  auto beginY = std::begin(rangeY);
-  auto endY   = std::end(rangeY);
-  auto range1X = std::views::iota((Index_type)1,nx);
-  auto begin1X = std::begin(range1X);
-  auto end1X   = std::end(range1X);
-  auto rangeXm1 = std::views::iota((Index_type)0,nx-1);
-  auto beginXm1 = std::begin(rangeXm1);
-  auto endXm1   = std::end(rangeXm1);
-#else
-  thrust::counting_iterator<Index_type> beginX(0);
-  thrust::counting_iterator<Index_type> endX(nx);
-  thrust::counting_iterator<Index_type> beginY(0);
-  thrust::counting_iterator<Index_type> endY(ny);
-  thrust::counting_iterator<Index_type> begin1X(1);
-  thrust::counting_iterator<Index_type> end1X(nx);
-  thrust::counting_iterator<Index_type> beginXm1(0);
-  thrust::counting_iterator<Index_type> endXm1(nx-1);
-#endif
+  counting_iterator<Index_type> beginX(0);
+  counting_iterator<Index_type> endX(nx);
+  counting_iterator<Index_type> beginY(0);
+  counting_iterator<Index_type> endY(ny);
+  counting_iterator<Index_type> begin1X(1);
+  counting_iterator<Index_type> end1X(nx);
+  counting_iterator<Index_type> beginXm1(0);
+  counting_iterator<Index_type> endXm1(nx-1);
 
   switch ( vid ) {
 

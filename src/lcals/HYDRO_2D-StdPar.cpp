@@ -32,16 +32,16 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
   const Index_type jbeg = 1;
   const Index_type jend = m_jn - 1;
 
+  auto beginK = counting_iterator<Index_type>(kbeg);
+  auto endK   = counting_iterator<Index_type>(kend);
+  auto beginJ = counting_iterator<Index_type>(jbeg);
+  auto endJ   = counting_iterator<Index_type>(jend);
+
   HYDRO_2D_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto beginK = counting_iterator<Index_type>(kbeg);
-      auto endK   = counting_iterator<Index_type>(kend);
-      auto beginJ = counting_iterator<Index_type>(jbeg);
-      auto endJ   = counting_iterator<Index_type>(jend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -93,11 +93,6 @@ void HYDRO_2D::runStdParVariant(VariantID vid)
       auto hydro2d_base_lam3 = [=] (Index_type k, Index_type j) {
                                  HYDRO_2D_BODY3;
                                };
-
-      auto beginK = counting_iterator<Index_type>(kbeg);
-      auto endK   = counting_iterator<Index_type>(kend);
-      auto beginJ = counting_iterator<Index_type>(jbeg);
-      auto endJ   = counting_iterator<Index_type>(jend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

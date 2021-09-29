@@ -30,12 +30,12 @@ void LTIMES::runStdParVariant(VariantID vid)
 
   LTIMES_DATA_SETUP;
 
+  auto begin = counting_iterator<Index_type>(0);
+  auto end   = counting_iterator<Index_type>(num_z);
+
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(num_z);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -64,9 +64,6 @@ void LTIMES::runStdParVariant(VariantID vid)
                                  Index_type g, Index_type m) {
                                LTIMES_BODY;
                              };
-
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(num_z);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

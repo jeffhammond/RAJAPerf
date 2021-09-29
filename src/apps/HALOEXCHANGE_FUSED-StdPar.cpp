@@ -57,8 +57,8 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
         auto begin = counting_iterator<Index_type>(0);
         auto end   = counting_iterator<Index_type>(pack_index);
         std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type j) {
+                       begin, end,
+                       [=](Index_type j) {
           Real_ptr   buffer = pack_ptr_holders[j].buffer;
           Int_ptr    list   = pack_ptr_holders[j].list;
           Real_ptr   var    = pack_ptr_holders[j].var;
@@ -129,8 +129,8 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
         auto begin = counting_iterator<Index_type>(0);
         auto end   = counting_iterator<Index_type>(pack_index);
         std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type j) {
+                       begin, end,
+                       [=](Index_type j) {
           auto       pack_lambda = pack_lambdas[j];
           Index_type len         = pack_lens[j];
           for (Index_type i = 0; i < len; i++) {
@@ -152,13 +152,18 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
             buffer += len;
           }
         }
-        for (Index_type j = 0; j < unpack_index; j++) {
+        auto begin2 = counting_iterator<Index_type>(0);
+        auto end2   = counting_iterator<Index_type>(unpack_index);
+        std::for_each( std::execution::par_unseq,
+                       begin2, end2,
+                       [=](Index_type j) {
+        //for (Index_type j = 0; j < unpack_index; j++) {
           auto       unpack_lambda = unpack_lambdas[j];
           Index_type len           = unpack_lens[j];
           for (Index_type i = 0; i < len; i++) {
             unpack_lambda(i);
           }
-        }
+        });
 
       }
       stopTimer();

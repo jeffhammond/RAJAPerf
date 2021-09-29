@@ -10,12 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -36,24 +31,12 @@ void POLYBENCH_FLOYD_WARSHALL::runStdParVariant(VariantID vid)
 
   POLYBENCH_FLOYD_WARSHALL_DATA_SETUP;
 
-#ifdef USE_RANGES
-#  ifdef USE_STDPAR_COLLAPSE
-  auto range2 = std::views::iota((Index_type)0,N*N);
-  auto begin2 = std::begin(range2);
-  auto end2   = std::end(range2);
-#  else
-  auto range = std::views::iota((Index_type)0,N);
-  auto begin = std::begin(range);
-  auto end   = std::end(range);
-#  endif
+#ifdef USE_STDPAR_COLLAPSE
+  counting_iterator<Index_type> begin2(0);
+  counting_iterator<Index_type> end2(N*N);
 #else
-#  ifdef USE_STDPAR_COLLAPSE
-  thrust::counting_iterator<Index_type> begin2(0);
-  thrust::counting_iterator<Index_type> end2(N*N);
-#  else
-  thrust::counting_iterator<Index_type> begin(0);
-  thrust::counting_iterator<Index_type> end(N);
-#  endif
+  counting_iterator<Index_type> begin(0);
+  counting_iterator<Index_type> end(N);
 #endif
 
   switch ( vid ) {

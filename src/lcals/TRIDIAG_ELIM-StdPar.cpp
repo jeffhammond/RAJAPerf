@@ -30,6 +30,9 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
   const Index_type ibegin = 1;
   const Index_type iend = m_N;
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   TRIDIAG_ELIM_DATA_SETUP;
 
   auto tridiag_elim_lam = [=](Index_type i) {
@@ -39,9 +42,6 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -59,9 +59,6 @@ void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

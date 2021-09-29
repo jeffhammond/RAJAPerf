@@ -30,6 +30,9 @@ void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
 
   LTIMES_NOVIEW_DATA_SETUP;
  
+  auto begin = counting_iterator<Index_type>(0);
+  auto end   = counting_iterator<Index_type>(num_z);
+
   auto ltimesnoview_lam = [=](Index_type d, Index_type z, 
                               Index_type g, Index_type m) {
                                 LTIMES_NOVIEW_BODY;
@@ -38,9 +41,6 @@ void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(num_z);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -64,9 +64,6 @@ void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(num_z);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

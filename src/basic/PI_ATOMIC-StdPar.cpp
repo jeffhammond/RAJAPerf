@@ -31,20 +31,20 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   PI_ATOMIC_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
 
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::atomic<double> a_pi{m_pi_init};
-        std::for_each( std::execution::par_unseq,
+        std::for_each( //std::execution::par_unseq,
                        begin, end,
                         [=,&a_pi](Index_type i) {
           double x = (double(i) + 0.5) * dx;

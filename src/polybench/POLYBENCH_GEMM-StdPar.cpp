@@ -10,12 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -36,35 +31,17 @@ void POLYBENCH_GEMM::runStdParVariant(VariantID vid)
 
   POLYBENCH_GEMM_DATA_SETUP;
 
-#ifdef USE_RANGES
-#  ifdef USE_STDPAR_COLLAPSE
-  auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-  auto beginIJ = std::begin(rangeIJ);
-  auto endIJ   = std::end(rangeIJ);
-#  else
-  auto rangeI = std::views::iota((Index_type)0, ni);
-  auto beginI = std::begin(rangeI);
-  auto endI   = std::end(rangeI);
-  auto rangeJ = std::views::iota((Index_type)0, nj);
-  auto beginJ = std::begin(rangeJ);
-  auto endJ   = std::end(rangeJ);
-#  endif
-  auto rangeK = std::views::iota((Index_type)0, nk);
-  auto beginK = std::begin(rangeK);
-  auto endK   = std::end(rangeK);
+#ifdef USE_STDPAR_COLLAPSE
+  counting_iterator<Index_type> beginIJ(0);
+  counting_iterator<Index_type> endIJ(ni*nj);
 #else
-#  ifdef USE_STDPAR_COLLAPSE
-  thrust::counting_iterator<Index_type> beginIJ(0);
-  thrust::counting_iterator<Index_type> endIJ(ni*nj);
-#  else
-  thrust::counting_iterator<Index_type> beginI(0);
-  thrust::counting_iterator<Index_type> beginJ(0);
-  thrust::counting_iterator<Index_type> endJ(nj);
-  thrust::counting_iterator<Index_type> endI(ni);
-#  endif
-  thrust::counting_iterator<Index_type> beginK(0);
-  thrust::counting_iterator<Index_type> endK(nk);
+  counting_iterator<Index_type> beginI(0);
+  counting_iterator<Index_type> beginJ(0);
+  counting_iterator<Index_type> endJ(nj);
+  counting_iterator<Index_type> endI(ni);
 #endif
+  counting_iterator<Index_type> beginK(0);
+  counting_iterator<Index_type> endK(nk);
 
   switch ( vid ) {
 

@@ -16,6 +16,7 @@
 #include <thrust/iterator/counting_iterator.h>
 #endif
 
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -34,14 +35,8 @@ void POLYBENCH_ADI::runStdParVariant(VariantID vid)
 
   POLYBENCH_ADI_DATA_SETUP;
 
-#ifdef USE_RANGES
-  auto range = std::views::iota((Index_type)1,n-1);
-  auto begin = std::begin(range);
-  auto end   = std::end(range);
-#else
-  thrust::counting_iterator<Index_type> begin(1);
-  thrust::counting_iterator<Index_type> end(n-1);
-#endif
+  counting_iterator<Index_type> begin(1);
+  counting_iterator<Index_type> end(n-1);
 
   switch ( vid ) {
 
