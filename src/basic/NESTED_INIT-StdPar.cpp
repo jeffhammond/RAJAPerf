@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -39,9 +39,11 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
     case Base_StdPar : {
 
 #ifdef USE_STDPAR_COLLAPSE
-      auto range = std::views::iota((Index_type)0, ni*nj*nk);
+      auto begin = counting_iterator<Index_type>(0);
+      auto end   = counting_iterator<Index_type>(ni*nj*nk);
 #else
-      auto range = std::views::iota((Index_type)0, nk);
+      auto begin = counting_iterator<Index_type>(0);
+      auto end   = counting_iterator<Index_type>(nk);
 #endif
 
       startTimer();
@@ -77,9 +79,11 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
     case Lambda_StdPar : {
 
 #ifdef USE_STDPAR_COLLAPSE
-      auto range = std::views::iota((Index_type)0, ni*nj*nk);
+      auto begin = counting_iterator<Index_type>(0);
+      auto end   = counting_iterator<Index_type>(ni*nj*nk);
 #else
-      auto range = std::views::iota((Index_type)0, nk);
+      auto begin = counting_iterator<Index_type>(0);
+      auto end   = counting_iterator<Index_type>(nk);
 #endif
 
       startTimer();
