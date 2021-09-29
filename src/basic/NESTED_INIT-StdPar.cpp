@@ -30,14 +30,6 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
 
   NESTED_INIT_DATA_SETUP;
 
-  auto nestedinit_lam = [=](Index_type i, Index_type j, Index_type k) {
-                          NESTED_INIT_BODY;
-                        };
-
-  switch ( vid ) {
-
-    case Base_StdPar : {
-
 #ifdef USE_STDPAR_COLLAPSE
       auto begin = counting_iterator<Index_type>(0);
       auto end   = counting_iterator<Index_type>(ni*nj*nk);
@@ -45,6 +37,14 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
       auto begin = counting_iterator<Index_type>(0);
       auto end   = counting_iterator<Index_type>(nk);
 #endif
+
+  auto nestedinit_lam = [=](Index_type i, Index_type j, Index_type k) {
+                          NESTED_INIT_BODY;
+                        };
+
+  switch ( vid ) {
+
+    case Base_StdPar : {
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -77,14 +77,6 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-#ifdef USE_STDPAR_COLLAPSE
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(ni*nj*nk);
-#else
-      auto begin = counting_iterator<Index_type>(0);
-      auto end   = counting_iterator<Index_type>(nk);
-#endif
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

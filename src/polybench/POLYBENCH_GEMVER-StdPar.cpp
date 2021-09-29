@@ -10,12 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -36,14 +31,8 @@ void POLYBENCH_GEMVER::runStdParVariant(VariantID vid)
 
   POLYBENCH_GEMVER_DATA_SETUP;
 
-#ifdef USE_RANGES
-  auto range = std::views::iota((Index_type)0, n);
-  auto begin = std::begin(range);
-  auto end   = std::end(range);
-#else
-  thrust::counting_iterator<Index_type> begin(0);
-  thrust::counting_iterator<Index_type> end(n);
-#endif
+  counting_iterator<Index_type> begin(0);
+  counting_iterator<Index_type> end(n);
 
   switch ( vid ) {
 

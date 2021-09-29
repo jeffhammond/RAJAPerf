@@ -10,12 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -36,55 +31,25 @@ void POLYBENCH_3MM::runStdParVariant(VariantID vid)
 
   POLYBENCH_3MM_DATA_SETUP;
 
-#ifdef USE_RANGES
-#  ifdef USE_STDPAR_COLLAPSE
-  auto rangeIJ = std::views::iota((Index_type)0, ni*nj);
-  auto beginIJ = std::begin(rangeIJ);
-  auto endIJ   = std::end(rangeIJ);
-  auto rangeIL = std::views::iota((Index_type)0, ni*nl);
-  auto beginIL = std::begin(rangeIL);
-  auto endIL   = std::end(rangeIL);
-  auto rangeJL = std::views::iota((Index_type)0, nj*nl);
-  auto beginJL = std::begin(rangeJL);
-  auto endJL   = std::end(rangeJL);
-#  else
-  auto rangeI = std::views::iota((Index_type)0, ni);
-  auto beginI = std::begin(rangeI);
-  auto endI   = std::end(rangeI);
-  auto rangeL = std::views::iota((Index_type)0, nl);
-  auto beginL = std::begin(rangeL);
-  auto endL   = std::end(rangeL);
-#  endif
-  auto rangeJ = std::views::iota((Index_type)0, nj);
-  auto beginJ = std::begin(rangeJ);
-  auto endJ   = std::end(rangeJ);
-  auto rangeK = std::views::iota((Index_type)0, nk);
-  auto beginK = std::begin(rangeK);
-  auto endK   = std::end(rangeK);
-  auto rangeM = std::views::iota((Index_type)0, nm);
-  auto beginM = std::begin(rangeM);
-  auto endM   = std::end(rangeM);
+#ifdef USE_STDPAR_COLLAPSE
+  counting_iterator<Index_type> beginIJ(0);
+  counting_iterator<Index_type> endIJ(ni*nj);
+  counting_iterator<Index_type> beginIL(0);
+  counting_iterator<Index_type> endIL(ni*nl);
+  counting_iterator<Index_type> beginJL(0);
+  counting_iterator<Index_type> endJL(nj*nl);
 #else
-#  ifdef USE_STDPAR_COLLAPSE
-  thrust::counting_iterator<Index_type> beginIJ(0);
-  thrust::counting_iterator<Index_type> endIJ(ni*nj);
-  thrust::counting_iterator<Index_type> beginIL(0);
-  thrust::counting_iterator<Index_type> endIL(ni*nl);
-  thrust::counting_iterator<Index_type> beginJL(0);
-  thrust::counting_iterator<Index_type> endJL(nj*nl);
-#  else
-  thrust::counting_iterator<Index_type> beginI(0);
-  thrust::counting_iterator<Index_type> endI(ni);
-  thrust::counting_iterator<Index_type> beginL(0);
-  thrust::counting_iterator<Index_type> endL(nl);
-#  endif
-  thrust::counting_iterator<Index_type> beginJ(0);
-  thrust::counting_iterator<Index_type> endJ(nj);
-  thrust::counting_iterator<Index_type> beginK(0);
-  thrust::counting_iterator<Index_type> endK(nk);
-  thrust::counting_iterator<Index_type> beginM(0);
-  thrust::counting_iterator<Index_type> endM(nm);
+  counting_iterator<Index_type> beginI(0);
+  counting_iterator<Index_type> endI(ni);
+  counting_iterator<Index_type> beginL(0);
+  counting_iterator<Index_type> endL(nl);
 #endif
+  counting_iterator<Index_type> beginJ(0);
+  counting_iterator<Index_type> endJ(nj);
+  counting_iterator<Index_type> beginK(0);
+  counting_iterator<Index_type> endK(nk);
+  counting_iterator<Index_type> beginM(0);
+  counting_iterator<Index_type> endM(nm);
 
   switch ( vid ) {
 

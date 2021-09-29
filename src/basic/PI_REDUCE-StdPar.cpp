@@ -31,14 +31,14 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = getActualProblemSize();
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   PI_REDUCE_DATA_SETUP;
 
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -65,9 +65,6 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
                                  double x = (double(i) + 0.5) * dx;
                                  return dx / (1.0 + x * x);
                                };
-
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {

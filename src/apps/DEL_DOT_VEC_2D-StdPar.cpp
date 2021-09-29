@@ -34,6 +34,9 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
   const Index_type ibegin = 0;
   const Index_type iend = m_domain->n_real_zones;
 
+  auto begin = counting_iterator<Index_type>(ibegin);
+  auto end   = counting_iterator<Index_type>(iend);
+
   DEL_DOT_VEC_2D_DATA_SETUP;
 
   NDSET2D(m_domain->jp, x,x1,x2,x3,x4) ;
@@ -45,15 +48,12 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
 
     case Base_StdPar : {
 
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type ii) {
+                       begin, end,
+                       [=](Index_type ii) {
           DEL_DOT_VEC_2D_BODY_INDEX;
           DEL_DOT_VEC_2D_BODY;
         });
@@ -71,15 +71,12 @@ void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
                                     DEL_DOT_VEC_2D_BODY;
                                   };
 
-      auto begin = counting_iterator<Index_type>(ibegin);
-      auto end   = counting_iterator<Index_type>(iend);
-
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        begin, end,
-                        [=](Index_type ii) {
+                       begin, end,
+                       [=](Index_type ii) {
           deldotvec2d_base_lam(ii);
         });
 

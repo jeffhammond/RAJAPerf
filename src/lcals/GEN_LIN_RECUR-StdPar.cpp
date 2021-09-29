@@ -30,6 +30,11 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
 
   GEN_LIN_RECUR_DATA_SETUP;
 
+  auto beginK = counting_iterator<Index_type>(0);
+  auto endK   = counting_iterator<Index_type>(N);
+  auto beginI = counting_iterator<Index_type>(1);
+  auto endI   = counting_iterator<Index_type>(N+1);
+
   auto genlinrecur_lam1 = [=](Index_type k) {
                             GEN_LIN_RECUR_BODY1;
                           };
@@ -40,11 +45,6 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
   switch ( vid ) {
 
     case Base_StdPar : {
-
-      auto beginK = counting_iterator<Index_type>(0);
-      auto endK   = counting_iterator<Index_type>(N);
-      auto beginI = counting_iterator<Index_type>(1);
-      auto endI   = counting_iterator<Index_type>(N+1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
@@ -70,11 +70,6 @@ void GEN_LIN_RECUR::runStdParVariant(VariantID vid)
     }
 
     case Lambda_StdPar : {
-
-      auto beginK = counting_iterator<Index_type>(0);
-      auto endK   = counting_iterator<Index_type>(N);
-      auto beginI = counting_iterator<Index_type>(1);
-      auto endI   = counting_iterator<Index_type>(N+1);
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
