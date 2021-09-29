@@ -11,7 +11,7 @@
 #include "RAJA/RAJA.hpp"
 
 #include <array>
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <numeric>
 #include <execution>

@@ -11,7 +11,7 @@
 #include "RAJA/RAJA.hpp"
 
 #include <atomic>
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
