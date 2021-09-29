@@ -42,12 +42,12 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             POLYBENCH_JACOBI_1D_BODY1;
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             POLYBENCH_JACOBI_1D_BODY2;
           });
@@ -79,12 +79,12 @@ void POLYBENCH_JACOBI_1D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             poly_jacobi1d_lam1(i);
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             poly_jacobi1d_lam2(i);
           });

@@ -45,7 +45,7 @@ void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type z) {
           for (Index_type g = 0; g < num_g; ++g ) {
             for (Index_type m = 0; m < num_m; ++m ) {
@@ -70,7 +70,7 @@ void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type z) {
           for (Index_type g = 0; g < num_g; ++g ) {
             for (Index_type m = 0; m < num_m; ++m ) {

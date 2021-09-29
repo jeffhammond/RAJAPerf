@@ -51,9 +51,9 @@ void POLYBENCH_FLOYD_WARSHALL::runStdParVariant(VariantID vid)
             const auto i  = ki % N;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type k) {
-          std::for_each( std::begin(range), std::end(range),
+          std::for_each( begin, end,
                           [=](Index_type i) {
 #endif
             for (Index_type j = 0; j < N; ++j) { 
@@ -93,9 +93,9 @@ void POLYBENCH_FLOYD_WARSHALL::runStdParVariant(VariantID vid)
             const auto i  = ki % N;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type k) {
-          std::for_each( std::begin(range), std::end(range),
+          std::for_each( begin, end,
                           [=](Index_type i) {
 #endif
             for (Index_type j = 0; j < N; ++j) {

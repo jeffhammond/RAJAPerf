@@ -49,13 +49,13 @@ void PRESSURE::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           PRESSURE_BODY1;
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           PRESSURE_BODY2;
         });
@@ -74,13 +74,13 @@ void PRESSURE::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
        std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
          pressure_lam1(i);
        });
 
        std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
          pressure_lam2(i);
        });

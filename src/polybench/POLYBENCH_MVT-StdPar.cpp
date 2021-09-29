@@ -38,11 +38,11 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY1;
           std::for_each( std::execution::unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=,&dot](Index_type j) {
             POLYBENCH_MVT_BODY2;
           });
@@ -50,11 +50,11 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY4;
           std::for_each( std::execution::unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=,&dot](Index_type j) {
             POLYBENCH_MVT_BODY5;
           });
@@ -92,11 +92,11 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY1;
           std::for_each( std::execution::unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=,&dot](Index_type j) {
             poly_mvt_base_lam2(i, j, dot);
           });
@@ -104,11 +104,11 @@ void POLYBENCH_MVT::runStdParVariant(VariantID vid)
         });
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           POLYBENCH_MVT_BODY4;
           std::for_each( std::execution::unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=,&dot](Index_type j) {
             poly_mvt_base_lam5(i, j, dot);
           });

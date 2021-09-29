@@ -46,7 +46,7 @@ void INT_PREDICT::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           INT_PREDICT_BODY;
         });
@@ -65,7 +65,7 @@ void INT_PREDICT::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type i) {
           intpredict_lam(i);
         });

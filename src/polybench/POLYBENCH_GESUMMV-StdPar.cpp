@@ -41,9 +41,9 @@ void POLYBENCH_GESUMMV::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range), [=](Index_type i) {
+                       begin, end, [=](Index_type i) {
           POLYBENCH_GESUMMV_BODY1;
-          std::for_each( std::begin(range), std::end(range), [=,&tmpdot,&ydot](Index_type j) {
+          std::for_each( begin, end, [=,&tmpdot,&ydot](Index_type j) {
             POLYBENCH_GESUMMV_BODY2;
           });
           POLYBENCH_GESUMMV_BODY3;
@@ -73,9 +73,9 @@ void POLYBENCH_GESUMMV::runStdParVariant(VariantID vid)
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range), [=](Index_type i) {
+                       begin, end, [=](Index_type i) {
           POLYBENCH_GESUMMV_BODY1;
-          std::for_each( std::begin(range), std::end(range), [=,&tmpdot,&ydot](Index_type j) {
+          std::for_each( begin, end, [=,&tmpdot,&ydot](Index_type j) {
             poly_gesummv_base_lam2(i, j, tmpdot, ydot);
           });
           poly_gesummv_base_lam3(i, tmpdot, ydot);

@@ -42,19 +42,19 @@ void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               POLYBENCH_JACOBI_2D_BODY1;
             });
           });
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               POLYBENCH_JACOBI_2D_BODY2;
             });
@@ -87,20 +87,20 @@ void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) {
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               poly_jacobi2d_base_lam1(i, j);
             });
           });
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               poly_jacobi2d_base_lam2(i, j);
             });

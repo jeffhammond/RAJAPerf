@@ -44,7 +44,7 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
 
         std::atomic<double> a_pi{m_pi_init};
         std::for_each( std::execution::par_unseq,
-                       std::begin(range), std::end(range),
+                       begin, end,
                         [=,&a_pi](Index_type i) {
           double x = (double(i) + 0.5) * dx;
           a_pi += dx / (1.0 + x * x);

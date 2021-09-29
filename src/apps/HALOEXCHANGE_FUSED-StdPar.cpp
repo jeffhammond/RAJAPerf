@@ -56,7 +56,7 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
 
         auto range = std::views::iota((Index_type)0,pack_index);
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type j) {
           Real_ptr   buffer = pack_ptr_holders[j].buffer;
           Int_ptr    list   = pack_ptr_holders[j].list;
@@ -126,7 +126,7 @@ void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
         }
         auto range = std::views::iota((Index_type)0,pack_index);
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type j) {
           auto       pack_lambda = pack_lambdas[j];
           Index_type len         = pack_lens[j];

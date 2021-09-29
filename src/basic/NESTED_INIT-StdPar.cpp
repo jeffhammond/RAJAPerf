@@ -49,7 +49,7 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type idx) {
               const auto k  = idx / (nj*ni);
               const auto ij = idx % (nj*ni);
@@ -57,7 +57,7 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
               const auto i  = ij % ni;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type k) {
             for (Index_type j = 0; j < nj; ++j )
               for (Index_type i = 0; i < ni; ++i )
@@ -87,7 +87,7 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
 
 #ifdef USE_STDPAR_COLLAPSE
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type idx) {
               const auto k  = idx / (nj*ni);
               const auto ij = idx % (nj*ni);
@@ -95,7 +95,7 @@ void NESTED_INIT::runStdParVariant(VariantID vid)
               const auto i  = ij % ni;
 #else
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type k) {
             for (Index_type j = 0; j < nj; ++j )
               for (Index_type i = 0; i < ni; ++i )

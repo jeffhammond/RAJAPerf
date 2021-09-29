@@ -46,7 +46,7 @@ void REDUCE3_INT::runStdParVariant(VariantID vid)
         typedef std::array<Int_type,3> Reduce_type;
         Reduce_type result =
         std::transform_reduce( std::execution::par_unseq,
-                                      std::begin(range), std::end(range),
+                                      begin, end,
                                       Reduce_type{m_vsum_init,m_vmin_init,m_vmax_init},
                         [=](Reduce_type a, Reduce_type b) -> Reduce_type {
                              auto plus = a[0] + b[0];

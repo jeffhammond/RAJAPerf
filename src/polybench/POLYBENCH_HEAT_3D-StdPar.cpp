@@ -41,13 +41,13 @@ void POLYBENCH_HEAT_3D::runStdParVariant(VariantID vid)
         for (Index_type t = 0; t < tsteps; ++t) { 
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type k) {
                 POLYBENCH_HEAT_3D_BODY1;
               });
@@ -55,13 +55,13 @@ void POLYBENCH_HEAT_3D::runStdParVariant(VariantID vid)
           });
 
           std::for_each( std::execution::par_unseq,
-                          std::begin(range), std::end(range),
+                          begin, end,
                           [=](Index_type i) {
             std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type j) {
               std::for_each( std::execution::unseq,
-                            std::begin(range), std::end(range),
+                            begin, end,
                             [=](Index_type k) {
                 POLYBENCH_HEAT_3D_BODY2;
               });

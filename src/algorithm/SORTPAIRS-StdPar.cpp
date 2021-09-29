@@ -59,7 +59,7 @@ void SORTPAIRS::runStdParVariant(VariantID vid)
 
         //for (Index_type iemp = ibegin; iemp < iend; ++iemp) {
         std::for_each( std::execution::par_unseq,
-                        std::begin(range), std::end(range),
+                        begin, end,
                         [=](Index_type iemp) {
           const pair_type& pair = vector_of_pairs[iemp - ibegin];
           x[iend*irep + iemp] = pair.first;
