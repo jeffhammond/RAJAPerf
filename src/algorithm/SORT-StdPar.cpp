@@ -38,8 +38,8 @@ void SORT::runStdParVariant(VariantID vid)
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
-        std::sort(std::execution::par_unseq,
-                  STD_SORT_ARGS);
+        std::sort( std::execution::par_unseq,
+                   STD_SORT_ARGS);
 
       }
       stopTimer();
