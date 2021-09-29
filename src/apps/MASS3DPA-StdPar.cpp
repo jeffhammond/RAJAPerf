@@ -10,7 +10,7 @@
 
 #include "RAJA/RAJA.hpp"
 
-#include <ranges>
+#include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
 
@@ -39,14 +39,15 @@ void MASS3DPA::runStdParVariant(VariantID vid) {
 
   case Base_StdPar: {
 
-    auto range = std::views::iota(0,(int)NE);
+    auto begin = counting_iterator<int>(0);
+    auto end   = counting_iterator<int>((int)NE);
 
     startTimer();
     for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
       std::for_each( std::execution::par_unseq,
-                      begin, end,
-                      [=](int e) {
+                     begin, end,
+                     [=](int e) {
 
         MASS3DPA_0_CPU
 
