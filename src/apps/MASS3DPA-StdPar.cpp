@@ -26,7 +26,7 @@ namespace apps {
 #else
 #define RAJA_UNROLL(N)
 #endif
-#define FOREACH_THREAD(i, k, N) for (int i = 0; i < N; i++)
+#define CPU_FOREACH(i, k, N) for (int i = 0; i < N; i++)
 
 void MASS3DPA::runStdParVariant(VariantID vid) {
 #if defined(RUN_STDPAR)
@@ -51,53 +51,53 @@ void MASS3DPA::runStdParVariant(VariantID vid) {
 
         MASS3DPA_0_CPU
 
-        FOREACH_THREAD(dy, y, D1D) {
-          FOREACH_THREAD(dx, x, D1D){
+        CPU_FOREACH(dy, y, MPA_D1D) {
+          CPU_FOREACH(dx, x, MPA_D1D){
             MASS3DPA_1
           }
-          FOREACH_THREAD(dx, x, Q1D) {
+          CPU_FOREACH(dx, x, MPA_Q1D) {
             MASS3DPA_2
           }
         }
 
-        FOREACH_THREAD(dy, y, D1D) {
-          FOREACH_THREAD(qx, x, Q1D) {
+        CPU_FOREACH(dy, y, MPA_D1D) {
+          CPU_FOREACH(qx, x, MPA_Q1D) {
             MASS3DPA_3
           }
         }
 
-        FOREACH_THREAD(qy, y, Q1D) {
-          FOREACH_THREAD(qx, x, Q1D) {
+        CPU_FOREACH(qy, y, MPA_Q1D) {
+          CPU_FOREACH(qx, x, MPA_Q1D) {
             MASS3DPA_4
           }
         }
 
-        FOREACH_THREAD(qy, y, Q1D) {
-          FOREACH_THREAD(qx, x, Q1D) {
+        CPU_FOREACH(qy, y, MPA_Q1D) {
+          CPU_FOREACH(qx, x, MPA_Q1D) {
             MASS3DPA_5
           }
         }
 
-        FOREACH_THREAD(d, y, D1D) {
-          FOREACH_THREAD(q, x, Q1D) {
+        CPU_FOREACH(d, y, MPA_D1D) {
+          CPU_FOREACH(q, x, MPA_Q1D) {
             MASS3DPA_6
           }
         }
 
-        FOREACH_THREAD(qy, y, Q1D) {
-          FOREACH_THREAD(dx, x, D1D) {
+        CPU_FOREACH(qy, y, MPA_Q1D) {
+          CPU_FOREACH(dx, x, MPA_D1D) {
             MASS3DPA_7
           }
         }
 
-        FOREACH_THREAD(dy, y, D1D) {
-          FOREACH_THREAD(dx, x, D1D) {
+        CPU_FOREACH(dy, y, MPA_D1D) {
+          CPU_FOREACH(dx, x, MPA_D1D) {
             MASS3DPA_8
           }
         }
 
-        FOREACH_THREAD(dy, y, D1D) {
-          FOREACH_THREAD(dx, x, D1D) {
+        CPU_FOREACH(dy, y, MPA_D1D) {
+          CPU_FOREACH(dx, x, MPA_D1D) {
             MASS3DPA_9
           }
         }
@@ -147,68 +147,68 @@ void MASS3DPA::runStdParVariant(VariantID vid) {
 
                   MASS3DPA_0_CPU
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, D1D), [&](int dy) {
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, D1D), [&](int dx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dy) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dx) {
                           MASS3DPA_1
                        });
 
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, Q1D), [&](int dx) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int dx) {
                           MASS3DPA_2
                       });
                    });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, D1D), [&](int dy) {
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dy) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qx) {
                           MASS3DPA_3
                       });
                    });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qy) {
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qy) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qx) {
                           MASS3DPA_4
                       });
                   });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qy) {
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qy) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qx) {
                           MASS3DPA_5
                       });
                   });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, D1D), [&](int d) {
-                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, Q1D), [&](int q) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int d) {
+                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int q) {
                         MASS3DPA_6
                      });
                   });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, Q1D), [&](int qy) {
-                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, D1D), [&](int dx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_Q1D), [&](int qy) {
+                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dx) {
                         MASS3DPA_7
                      });
                   });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, D1D), [&](int dy) {
-                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, D1D), [&](int dx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dy) {
+                      RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dx) {
                           MASS3DPA_8
                       });
                   });
 
                   ctx.teamSync();
 
-                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, D1D), [&](int dy) {
-                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, D1D), [&](int dx) {
+                  RAJA::expt::loop<inner_y>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dy) {
+                    RAJA::expt::loop<inner_x>(ctx, RAJA::RangeSegment(0, MPA_D1D), [&](int dx) {
                         MASS3DPA_9
                     });
                   });
