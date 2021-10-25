@@ -10,7 +10,14 @@
 
 #include "RAJA/RAJA.hpp"
 
+#if defined(__NVCOMPILER_CUDA__) || defined(_NVHPC_STDPAR_CUDA)
+#include <cuda/atomic>
+typedef cuda::std::atomic<double> myAtomic;
+#else
 #include <atomic>
+typedef std::atomic<double> myAtomic;
+#endif
+
 #include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
@@ -43,12 +50,12 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
-        std::atomic<double> a_pi{m_pi_init};
-        std::for_each( //std::execution::par_unseq,
+        myAtomic a_pi{m_pi_init};
+        std::for_each( std::execution::par_unseq,
                        begin, end,
-                        [=,&a_pi](Index_type i) {
+                       [=,&a_pi](Index_type i) {
           double x = (double(i) + 0.5) * dx;
-          a_pi += dx / (1.0 + x * x);
+          a_pi = a_pi + dx / (1.0 + x * x);
         });
         *pi = a_pi * 4.0;
 
@@ -60,15 +67,15 @@ void PI_ATOMIC::runStdParVariant(VariantID vid)
 
     case Lambda_StdPar : {
 
-      auto piatomic_base_lam = [=](Index_type i, std::atomic<double> &a_pi) {
+      auto piatomic_base_lam = [=](Index_type i, myAtomic &a_pi) {
                                  double x = (double(i) + 0.5) * dx;
-                                 a_pi += dx / (1.0 + x * x);
+                                 a_pi = a_pi + dx / (1.0 + x * x);
                                };
 
       startTimer();
       for (RepIndex_type irep = 0; irep < run_reps; ++irep) {
 
-        std::atomic<double> a_pi{m_pi_init};
+        myAtomic a_pi{m_pi_init};
         for (Index_type i = ibegin; i < iend; ++i ) {
           piatomic_base_lam(i,a_pi);
         }
