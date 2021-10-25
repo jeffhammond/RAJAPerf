@@ -71,7 +71,7 @@ void TRAP_INT::runStdParVariant(VariantID vid)
 
         sumx += std::transform_reduce( std::execution::par_unseq,
                                      begin, end,
-                                     0.0, std::plus<>(),
+                                     0.0, std::plus<Real_type>(),
                         [=](Index_type i) {
           Real_type x = x0 + i*h;
           return trap_int_func(x, y, xp, yp);
@@ -98,7 +98,7 @@ void TRAP_INT::runStdParVariant(VariantID vid)
 
         sumx += std::transform_reduce( std::execution::par_unseq,
                                      begin, end,
-                                     0.0, std::plus<>(), trapint_base_lam);
+                                     0.0, std::plus<Real_type>(), trapint_base_lam);
 
         m_sumx += sumx * h;
 
