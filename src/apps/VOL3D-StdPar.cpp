@@ -100,8 +100,10 @@ void VOL3D::runStdParVariant(VariantID vid)
     default : {
       std::cout << "\n  VOL3D : Unknown variant id = " << vid << std::endl;
     }
-
   }
+
+#else
+  RAJA_UNUSED_VAR(vid);
 #endif
 }
 
