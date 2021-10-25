@@ -86,5 +86,6 @@ blt_add_library(
           MASS3DPA-StdPar.cpp
           PRESSURE-StdPar.cpp 
           VOL3D-StdPar.cpp
+          DIFFUSION3DPA-StdPar.cpp
   DEPENDS_ON common ${RAJA_PERFSUITE_DEPENDS}
   )
