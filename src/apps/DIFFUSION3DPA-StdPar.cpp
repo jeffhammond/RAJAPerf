@@ -254,6 +254,7 @@ void DIFFUSION3DPA::runStdParVariant(VariantID vid) {
 
     return;
   }
+#endif // RUN_RAJA_STDPAR
 
   default:
     std::cout << "\n DIFFUSION3DPA : Unknown StdPar variant id = " << vid
