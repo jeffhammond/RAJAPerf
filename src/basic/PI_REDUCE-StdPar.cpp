@@ -45,10 +45,10 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
 
         Real_type pi = m_pi_init;
         pi += std::transform_reduce( std::execution::par_unseq,
-                                      begin, end,
-                                      0.0, std::plus<>(),
+                                     begin, end,
+                                     Real_type(0), std::plus<Real_type>(),
                         [=](Index_type i) {
-          double x = (double(i) + 0.5) * dx;
+          Real_type x = (Real_type(i) + 0.5) * dx;
           return dx / (1.0 + x * x);
         });
         m_pi = 4.0 * pi;
@@ -62,7 +62,7 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
     case Lambda_StdPar : {
 
       auto pireduce_base_lam = [=](Index_type i) -> Real_type {
-                                 double x = (double(i) + 0.5) * dx;
+                                 Real_type x = (Real_type(i) + 0.5) * dx;
                                  return dx / (1.0 + x * x);
                                };
 
@@ -72,8 +72,8 @@ void PI_REDUCE::runStdParVariant(VariantID vid)
         Real_type pi = m_pi_init;
 
         pi += std::transform_reduce( std::execution::par_unseq,
-                                      begin, end,
-                                      0.0, std::plus<>(), pireduce_base_lam);
+                                     begin, end,
+                                     Real_type(0), std::plus<Real_type>(), pireduce_base_lam);
 
         m_pi = 4.0 * pi;
 
