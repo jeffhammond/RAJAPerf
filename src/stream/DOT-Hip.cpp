@@ -71,7 +71,7 @@ __global__ void dot(Real_ptr a, Real_ptr b,
 }
 
 
-void DOT::runHipVariant(VariantID vid)
+void DOT::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

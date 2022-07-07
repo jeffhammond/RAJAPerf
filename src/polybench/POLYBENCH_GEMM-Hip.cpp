@@ -50,7 +50,7 @@ __global__ void poly_gemm(Real_ptr C, Real_ptr A, Real_ptr B,
 }
 
 
-void POLYBENCH_GEMM::runHipVariant(VariantID vid)
+void POLYBENCH_GEMM::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

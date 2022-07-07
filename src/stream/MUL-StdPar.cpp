@@ -22,7 +22,7 @@ namespace stream
 {
 
 
-void MUL::runStdParVariant(VariantID vid)
+void MUL::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

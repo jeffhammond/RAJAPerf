@@ -54,7 +54,7 @@ __global__ void poly_jacobi_2D_2(Real_ptr A, Real_ptr B, Index_type N)
 }
 
 
-void POLYBENCH_JACOBI_2D::runCudaVariant(VariantID vid)
+void POLYBENCH_JACOBI_2D::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

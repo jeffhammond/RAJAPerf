@@ -22,7 +22,7 @@ namespace basic
 {
 
 
-void MULADDSUB::runStdParVariant(VariantID vid)
+void MULADDSUB::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

@@ -26,7 +26,7 @@ namespace apps
 {
 
 
-void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid)
+void DEL_DOT_VEC_2D::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

@@ -22,7 +22,7 @@ namespace apps
 {
 
 
-void LTIMES_NOVIEW::runStdParVariant(VariantID vid)
+void LTIMES_NOVIEW::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

@@ -22,7 +22,7 @@ namespace lcals
 {
 
 
-void EOS::runStdParVariant(VariantID vid)
+void EOS::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

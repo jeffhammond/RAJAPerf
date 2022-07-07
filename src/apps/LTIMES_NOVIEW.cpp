@@ -86,19 +86,19 @@ LTIMES_NOVIEW::~LTIMES_NOVIEW()
 {
 }
 
-void LTIMES_NOVIEW::setUp(VariantID vid)
+void LTIMES_NOVIEW::setUp(VariantID vid, size_t tune_idx)
 {
   allocAndInitDataConst(m_phidat, int(m_philen), Real_type(0.0), vid);
   allocAndInitData(m_elldat, int(m_elllen), vid);
   allocAndInitData(m_psidat, int(m_psilen), vid);
 }
 
-void LTIMES_NOVIEW::updateChecksum(VariantID vid)
+void LTIMES_NOVIEW::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += calcChecksum(m_phidat, m_philen, checksum_scale_factor );
 }
 
-void LTIMES_NOVIEW::tearDown(VariantID vid)
+void LTIMES_NOVIEW::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
 

@@ -67,7 +67,7 @@ __global__ void poly_2mm_2(Real_ptr tmp, Real_ptr C, Real_ptr D,
 }
 
 
-void POLYBENCH_2MM::runCudaVariant(VariantID vid)
+void POLYBENCH_2MM::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

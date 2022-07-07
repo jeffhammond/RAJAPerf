@@ -59,7 +59,7 @@ INT_PREDICT::~INT_PREDICT()
 {
 }
 
-void INT_PREDICT::setUp(VariantID vid)
+void INT_PREDICT::setUp(VariantID vid, size_t tune_idx)
 {
   m_array_length = getActualProblemSize() * 13;
   m_offset = getActualProblemSize();
@@ -77,7 +77,7 @@ void INT_PREDICT::setUp(VariantID vid)
   initData(m_c0);
 }
 
-void INT_PREDICT::updateChecksum(VariantID vid)
+void INT_PREDICT::updateChecksum(VariantID vid, size_t tune_idx)
 {
   for (Index_type i = 0; i < getActualProblemSize(); ++i) {
     m_px[i] -= m_px_initval;
@@ -86,7 +86,7 @@ void INT_PREDICT::updateChecksum(VariantID vid)
   checksum[vid] += calcChecksum(m_px, getActualProblemSize());
 }
 
-void INT_PREDICT::tearDown(VariantID vid)
+void INT_PREDICT::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   deallocData(m_px);

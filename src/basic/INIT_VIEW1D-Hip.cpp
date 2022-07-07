@@ -45,7 +45,7 @@ __global__ void initview1d(Real_ptr a,
 }
 
 
-void INIT_VIEW1D::runHipVariant(VariantID vid)
+void INIT_VIEW1D::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

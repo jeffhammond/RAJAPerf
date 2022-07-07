@@ -61,7 +61,7 @@ __global__ void pi_reduce(Real_type dx,
 }
 
 
-void PI_REDUCE::runCudaVariant(VariantID vid)
+void PI_REDUCE::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

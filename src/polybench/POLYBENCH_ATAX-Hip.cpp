@@ -70,7 +70,7 @@ __global__ void poly_atax_2(Real_ptr A, Real_ptr tmp, Real_ptr y,
 }
 
 
-void POLYBENCH_ATAX::runHipVariant(VariantID vid)
+void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

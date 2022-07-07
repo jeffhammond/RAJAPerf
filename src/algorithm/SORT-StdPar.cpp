@@ -21,7 +21,7 @@ namespace algorithm
 {
 
 
-void SORT::runStdParVariant(VariantID vid)
+void SORT::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

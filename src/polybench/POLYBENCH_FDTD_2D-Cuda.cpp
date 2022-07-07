@@ -83,7 +83,7 @@ __global__ void poly_fdtd2d_4(Real_ptr hz, Real_ptr ex, Real_ptr ey,
 
 
 
-void POLYBENCH_FDTD_2D::runCudaVariant(VariantID vid)
+void POLYBENCH_FDTD_2D::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

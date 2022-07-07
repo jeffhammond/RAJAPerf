@@ -22,7 +22,7 @@ namespace lcals
 {
 
 
-void TRIDIAG_ELIM::runStdParVariant(VariantID vid)
+void TRIDIAG_ELIM::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

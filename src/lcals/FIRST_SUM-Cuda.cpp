@@ -46,7 +46,7 @@ __global__ void first_sum(Real_ptr x, Real_ptr y,
 }
 
 
-void FIRST_SUM::runCudaVariant(VariantID vid)
+void FIRST_SUM::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 1;

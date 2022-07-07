@@ -77,7 +77,7 @@ __global__ void ltimes_lam(Index_type num_m, Index_type num_g, Index_type num_z,
 }
 
 
-void LTIMES::runHipVariant(VariantID vid)
+void LTIMES::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

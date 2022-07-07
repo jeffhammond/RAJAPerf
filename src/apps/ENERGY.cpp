@@ -72,7 +72,7 @@ ENERGY::~ENERGY()
 {
 }
 
-void ENERGY::setUp(VariantID vid)
+void ENERGY::setUp(VariantID vid, size_t tune_idx)
 {
   allocAndInitDataConst(m_e_new, getActualProblemSize(), 0.0, vid);
   allocAndInitData(m_e_old, getActualProblemSize(), vid);
@@ -96,13 +96,13 @@ void ENERGY::setUp(VariantID vid)
   initData(m_q_cut);
 }
 
-void ENERGY::updateChecksum(VariantID vid)
+void ENERGY::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += calcChecksum(m_e_new, getActualProblemSize());
   checksum[vid] += calcChecksum(m_q_new, getActualProblemSize());
 }
 
-void ENERGY::tearDown(VariantID vid)
+void ENERGY::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
 

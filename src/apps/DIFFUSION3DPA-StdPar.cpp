@@ -23,7 +23,7 @@ namespace rajaperf {
 namespace apps {
 
 
-void DIFFUSION3DPA::runStdParVariant(VariantID vid) {
+void DIFFUSION3DPA::runStdParVariant(VariantID vid, size_t tune_idx) {
 
 #if defined(RUN_STDPAR)
 

@@ -24,7 +24,7 @@ namespace apps
 {
 
 
-void VOL3D::runStdParVariant(VariantID vid)
+void VOL3D::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

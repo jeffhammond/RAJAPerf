@@ -46,7 +46,7 @@ __global__ void copy(Real_ptr c, Real_ptr a,
 }
 
 
-void COPY::runCudaVariant(VariantID vid)
+void COPY::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

@@ -101,7 +101,7 @@ __global__ void poly_gemmver_4(Real_ptr A,
 }
 
 
-void POLYBENCH_GEMVER::runCudaVariant(VariantID vid)
+void POLYBENCH_GEMVER::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

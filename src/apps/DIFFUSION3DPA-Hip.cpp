@@ -98,7 +98,7 @@ __global__ void Diffusion3DPA(Index_type NE, const Real_ptr Basis, const Real_pt
 
 }
 
-void DIFFUSION3DPA::runHipVariant(VariantID vid) {
+void DIFFUSION3DPA::runHipVariant(VariantID vid, size_t tune_idx) {
   const Index_type run_reps = getRunReps();
 
   DIFFUSION3DPA_DATA_SETUP;

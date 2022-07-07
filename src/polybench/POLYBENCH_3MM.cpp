@@ -96,7 +96,7 @@ POLYBENCH_3MM::~POLYBENCH_3MM()
 {
 }
 
-void POLYBENCH_3MM::setUp(VariantID vid)
+void POLYBENCH_3MM::setUp(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   allocAndInitData(m_A, m_ni * m_nk, vid);
@@ -108,12 +108,12 @@ void POLYBENCH_3MM::setUp(VariantID vid)
   allocAndInitDataConst(m_G, m_ni * m_nl, 0.0, vid);
 }
 
-void POLYBENCH_3MM::updateChecksum(VariantID vid)
+void POLYBENCH_3MM::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += calcChecksum(m_G, m_ni * m_nl, checksum_scale_factor );
 }
 
-void POLYBENCH_3MM::tearDown(VariantID vid)
+void POLYBENCH_3MM::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   deallocData(m_A);

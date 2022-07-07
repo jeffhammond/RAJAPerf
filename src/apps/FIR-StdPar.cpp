@@ -22,7 +22,7 @@ namespace apps
 {
 
 
-void FIR::runStdParVariant(VariantID vid)
+void FIR::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

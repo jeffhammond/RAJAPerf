@@ -21,7 +21,7 @@ namespace rajaperf
 namespace polybench
 {
 
-void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid)
+void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

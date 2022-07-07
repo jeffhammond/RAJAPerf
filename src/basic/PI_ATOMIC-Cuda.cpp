@@ -45,7 +45,7 @@ __global__ void pi_atomic(Real_ptr pi,
 }
 
 
-void PI_ATOMIC::runCudaVariant(VariantID vid)
+void PI_ATOMIC::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

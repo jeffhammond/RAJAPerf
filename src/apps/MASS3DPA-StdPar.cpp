@@ -28,7 +28,7 @@ namespace apps {
 #endif
 #define CPU_FOREACH(i, k, N) for (int i = 0; i < N; i++)
 
-void MASS3DPA::runStdParVariant(VariantID vid) {
+void MASS3DPA::runStdParVariant(VariantID vid, size_t tune_idx) {
 #if defined(RUN_STDPAR)
 
   const Index_type run_reps = getRunReps();

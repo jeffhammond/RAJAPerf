@@ -58,7 +58,7 @@ COUPLE::~COUPLE()
   delete m_domain;
 }
 
-void COUPLE::setUp(VariantID vid)
+void COUPLE::setUp(VariantID vid, size_t tune_idx)
 {
   Index_type max_loop_index = m_domain->lrn;
 
@@ -80,7 +80,7 @@ void COUPLE::setUp(VariantID vid)
   m_ireal = Complex_type(0.0, 1.0);
 }
 
-void COUPLE::runKernel(VariantID vid)
+void COUPLE::runKernel(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 
@@ -179,7 +179,7 @@ void COUPLE::runKernel(VariantID vid)
   }
 }
 
-void COUPLE::updateChecksum(VariantID vid)
+void COUPLE::updateChecksum(VariantID vid, size_t tune_idx)
 {
   Index_type max_loop_index = m_domain->lrn;
 
@@ -188,7 +188,7 @@ void COUPLE::updateChecksum(VariantID vid)
   checksum[vid] += calcChecksum(m_t2, max_loop_index);
 }
 
-void COUPLE::tearDown(VariantID vid)
+void COUPLE::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
 

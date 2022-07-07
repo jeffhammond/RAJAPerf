@@ -80,13 +80,13 @@ Index_type KernelBase::getRunReps() const
   return run_reps;
 }
 
-void KernelBase::setVariantDefined(VariantID vid) 
+void KernelBase::setVariantDefined(VariantID vid, size_t tune_idx) 
 {
   has_variant_defined[vid] = isVariantAvailable(vid); 
 }
 
 
-void KernelBase::execute(VariantID vid) 
+void KernelBase::execute(VariantID vid, size_t tune_idx) 
 {
   running_variant = vid;
 
@@ -114,7 +114,7 @@ void KernelBase::recordExecTime()
   tot_time[running_variant] += exec_time;
 }
 
-void KernelBase::runKernel(VariantID vid)
+void KernelBase::runKernel(VariantID vid, size_t tune_idx)
 {
   if ( !has_variant_defined[vid] ) {
     return;

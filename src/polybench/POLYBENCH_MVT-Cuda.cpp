@@ -73,7 +73,7 @@ __global__ void poly_mvt_2(Real_ptr A, Real_ptr x2, Real_ptr y2,
 }
 
 
-void POLYBENCH_MVT::runCudaVariant(VariantID vid)
+void POLYBENCH_MVT::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

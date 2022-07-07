@@ -30,7 +30,7 @@ namespace basic
 {
 
 
-void PI_ATOMIC::runStdParVariant(VariantID vid)
+void PI_ATOMIC::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

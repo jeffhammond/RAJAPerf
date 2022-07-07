@@ -47,7 +47,7 @@ __global__ void diff_predict(Real_ptr px, Real_ptr cx,
 }
 
 
-void DIFF_PREDICT::runHipVariant(VariantID vid)
+void DIFF_PREDICT::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

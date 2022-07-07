@@ -81,7 +81,7 @@ __global__ void poly_3mm_3(Real_ptr G, Real_ptr E, Real_ptr F,
 }
 
 
-void POLYBENCH_3MM::runHipVariant(VariantID vid)
+void POLYBENCH_3MM::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

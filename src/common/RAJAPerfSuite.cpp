@@ -344,7 +344,7 @@ const std::string& getFullKernelName(KernelID kid)
  *
  *******************************************************************************
  */
-const std::string& getVariantName(VariantID vid)
+const std::string& getVariantName(VariantID vid, size_t tune_idx)
 {
   return VariantNames[vid];
 }
@@ -357,7 +357,7 @@ const std::string& getVariantName(VariantID vid)
  *
  *******************************************************************************
  */
-bool isVariantAvailable(VariantID vid)
+bool isVariantAvailable(VariantID vid, size_t tune_idx)
 {
   bool ret_val = false;
 

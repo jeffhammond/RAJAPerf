@@ -48,7 +48,7 @@ __global__ void add(Real_ptr c, Real_ptr a, Real_ptr b,
 }
 
 
-void ADD::runCudaVariant(VariantID vid)
+void ADD::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

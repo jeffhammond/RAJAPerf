@@ -24,7 +24,7 @@ namespace basic
 {
 
 
-void REDUCE3_INT::runStdParVariant(VariantID vid)
+void REDUCE3_INT::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

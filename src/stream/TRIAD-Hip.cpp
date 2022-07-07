@@ -48,7 +48,7 @@ __global__ void triad(Real_ptr a, Real_ptr b, Real_ptr c, Real_type alpha,
 }
 
 
-void TRIAD::runHipVariant(VariantID vid)
+void TRIAD::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

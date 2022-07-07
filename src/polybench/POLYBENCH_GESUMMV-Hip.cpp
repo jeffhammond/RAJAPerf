@@ -58,7 +58,7 @@ __global__ void poly_gesummv(Real_ptr x, Real_ptr y,
 }
 
 
-void POLYBENCH_GESUMMV::runHipVariant(VariantID vid)
+void POLYBENCH_GESUMMV::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

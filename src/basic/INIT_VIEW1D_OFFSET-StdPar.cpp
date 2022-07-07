@@ -22,7 +22,7 @@ namespace basic
 {
 
 
-void INIT_VIEW1D_OFFSET::runStdParVariant(VariantID vid)
+void INIT_VIEW1D_OFFSET::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

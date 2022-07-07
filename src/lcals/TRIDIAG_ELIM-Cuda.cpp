@@ -50,7 +50,7 @@ __global__ void eos(Real_ptr xout, Real_ptr xin, Real_ptr y, Real_ptr z,
 }
 
 
-void TRIDIAG_ELIM::runCudaVariant(VariantID vid)
+void TRIDIAG_ELIM::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 1;

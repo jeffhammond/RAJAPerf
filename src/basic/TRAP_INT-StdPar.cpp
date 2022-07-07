@@ -36,7 +36,7 @@ Real_type trap_int_func(Real_type x,
    return denom;
 }
 
-void TRAP_INT::runStdParVariant(VariantID vid)
+void TRAP_INT::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

@@ -87,7 +87,7 @@ __global__ void fir(Real_ptr out, Real_ptr in,
 #endif
 
 
-void FIR::runHipVariant(VariantID vid)
+void FIR::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

@@ -70,7 +70,7 @@ __global__ void nested_init_lam(Index_type ni, Index_type nj, Index_type nk,
 }
 
 
-void NESTED_INIT::runHipVariant(VariantID vid)
+void NESTED_INIT::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

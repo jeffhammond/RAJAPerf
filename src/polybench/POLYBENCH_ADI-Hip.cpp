@@ -78,7 +78,7 @@ __global__ void adi2(const Index_type n,
 }
 
 
-void POLYBENCH_ADI::runHipVariant(VariantID vid)
+void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

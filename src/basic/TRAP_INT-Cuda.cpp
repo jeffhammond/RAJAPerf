@@ -86,7 +86,7 @@ __global__ void trapint(Real_type x0, Real_type xp,
 }
 
 
-void TRAP_INT::runCudaVariant(VariantID vid)
+void TRAP_INT::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

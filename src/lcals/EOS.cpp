@@ -67,7 +67,7 @@ EOS::~EOS()
 {
 }
 
-void EOS::setUp(VariantID vid)
+void EOS::setUp(VariantID vid, size_t tune_idx)
 {
   allocAndInitDataConst(m_x, m_array_length, 0.0, vid);
   allocAndInitData(m_y, m_array_length, vid);
@@ -79,12 +79,12 @@ void EOS::setUp(VariantID vid)
   initData(m_t, vid);
 }
 
-void EOS::updateChecksum(VariantID vid)
+void EOS::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += calcChecksum(m_x, getActualProblemSize(), checksum_scale_factor );
 }
 
-void EOS::tearDown(VariantID vid)
+void EOS::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   deallocData(m_x);

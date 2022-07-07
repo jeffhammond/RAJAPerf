@@ -69,7 +69,7 @@ __global__ void haloexchange_unpack(Real_ptr buffer, Int_ptr list, Real_ptr var,
 }
 
 
-void HALOEXCHANGE::runCudaVariant(VariantID vid)
+void HALOEXCHANGE::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

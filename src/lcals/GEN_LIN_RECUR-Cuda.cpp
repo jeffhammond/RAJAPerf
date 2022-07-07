@@ -63,7 +63,7 @@ __global__ void genlinrecur2(Real_ptr b5, Real_ptr stb5,
 }
 
 
-void GEN_LIN_RECUR::runCudaVariant(VariantID vid)
+void GEN_LIN_RECUR::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

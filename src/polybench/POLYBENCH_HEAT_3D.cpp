@@ -80,7 +80,7 @@ POLYBENCH_HEAT_3D::~POLYBENCH_HEAT_3D()
 {
 }
 
-void POLYBENCH_HEAT_3D::setUp(VariantID vid)
+void POLYBENCH_HEAT_3D::setUp(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   allocAndInitData(m_Ainit, m_N*m_N*m_N, vid);
@@ -89,13 +89,13 @@ void POLYBENCH_HEAT_3D::setUp(VariantID vid)
   allocAndInitDataConst(m_B, m_N*m_N*m_N, 0.0, vid);
 }
 
-void POLYBENCH_HEAT_3D::updateChecksum(VariantID vid)
+void POLYBENCH_HEAT_3D::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += calcChecksum(m_A, m_N*m_N*m_N, checksum_scale_factor );
   checksum[vid] += calcChecksum(m_B, m_N*m_N*m_N, checksum_scale_factor );
 }
 
-void POLYBENCH_HEAT_3D::tearDown(VariantID vid)
+void POLYBENCH_HEAT_3D::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   deallocData(m_A);

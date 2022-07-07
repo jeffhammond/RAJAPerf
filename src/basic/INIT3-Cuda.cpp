@@ -55,7 +55,7 @@ __global__ void init3(Real_ptr out1, Real_ptr out2, Real_ptr out3,
 }
 
 
-void INIT3::runCudaVariant(VariantID vid)
+void INIT3::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

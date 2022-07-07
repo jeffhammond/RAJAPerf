@@ -13,7 +13,7 @@
 namespace rajaperf {
 namespace basic {
 
-void MAT_MAT_SHARED::runStdParVariant(VariantID vid) {
+void MAT_MAT_SHARED::runStdParVariant(VariantID vid, size_t tune_idx) {
 
   const Index_type run_reps = getRunReps();
   const Index_type N = m_N;

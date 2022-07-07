@@ -22,7 +22,7 @@ namespace basic
 {
 
 
-void IF_QUAD::runStdParVariant(VariantID vid)
+void IF_QUAD::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

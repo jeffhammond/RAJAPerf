@@ -22,7 +22,7 @@ namespace basic
 {
 
 
-void NESTED_INIT::runStdParVariant(VariantID vid)
+void NESTED_INIT::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

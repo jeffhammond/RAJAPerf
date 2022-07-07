@@ -66,7 +66,7 @@ __global__ void vol3d(Real_ptr vol,
 }
 
 
-void VOL3D::runCudaVariant(VariantID vid)
+void VOL3D::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = m_domain->fpz;

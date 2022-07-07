@@ -22,7 +22,7 @@ namespace basic
 {
 
 
-void DAXPY::runStdParVariant(VariantID vid)
+void DAXPY::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

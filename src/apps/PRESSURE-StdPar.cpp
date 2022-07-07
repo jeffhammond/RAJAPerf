@@ -22,7 +22,7 @@ namespace apps
 {
 
 
-void PRESSURE::runStdParVariant(VariantID vid)
+void PRESSURE::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

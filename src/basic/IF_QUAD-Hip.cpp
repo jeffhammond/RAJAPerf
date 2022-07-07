@@ -54,7 +54,7 @@ __global__ void ifquad(Real_ptr x1, Real_ptr x2,
 }
 
 
-void IF_QUAD::runHipVariant(VariantID vid)
+void IF_QUAD::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

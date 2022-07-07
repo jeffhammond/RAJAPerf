@@ -46,7 +46,7 @@ __global__ void initview1d_offset(Real_ptr a,
 }
 
 
-void INIT_VIEW1D_OFFSET::runHipVariant(VariantID vid)
+void INIT_VIEW1D_OFFSET::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 1;

@@ -41,7 +41,7 @@ __global__ void poly_floyd_warshall(Real_ptr pout, Real_ptr pin,
 }
 
 
-void POLYBENCH_FLOYD_WARSHALL::runCudaVariant(VariantID vid)
+void POLYBENCH_FLOYD_WARSHALL::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

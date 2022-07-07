@@ -107,7 +107,7 @@ __global__ void hydro_2d3(Real_ptr zroutdat, Real_ptr zzoutdat,
 }
 
 
-void HYDRO_2D::runHipVariant(VariantID vid)
+void HYDRO_2D::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type kbeg = 1;

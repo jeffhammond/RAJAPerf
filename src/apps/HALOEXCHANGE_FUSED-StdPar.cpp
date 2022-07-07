@@ -22,7 +22,7 @@ namespace apps
 {
 
 
-void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid)
+void HALOEXCHANGE_FUSED::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

@@ -46,7 +46,7 @@ __global__ void first_diff(Real_ptr x, Real_ptr y,
 }
 
 
-void FIRST_DIFF::runCudaVariant(VariantID vid)
+void FIRST_DIFF::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

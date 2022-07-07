@@ -61,7 +61,7 @@ PI_REDUCE::~PI_REDUCE()
 {
 }
 
-void PI_REDUCE::setUp(VariantID vid)
+void PI_REDUCE::setUp(VariantID vid, size_t tune_idx)
 {
   (void) vid;
   m_dx = 1.0 / double(getActualProblemSize());
@@ -69,12 +69,12 @@ void PI_REDUCE::setUp(VariantID vid)
   m_pi = 0.0;
 }
 
-void PI_REDUCE::updateChecksum(VariantID vid)
+void PI_REDUCE::updateChecksum(VariantID vid, size_t tune_idx)
 {
   checksum[vid] += Checksum_type(m_pi);
 }
 
-void PI_REDUCE::tearDown(VariantID vid)
+void PI_REDUCE::tearDown(VariantID vid, size_t tune_idx)
 {
   (void) vid;
 }

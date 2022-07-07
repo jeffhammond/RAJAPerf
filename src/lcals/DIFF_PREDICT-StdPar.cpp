@@ -22,7 +22,7 @@ namespace lcals
 {
 
 
-void DIFF_PREDICT::runStdParVariant(VariantID vid)
+void DIFF_PREDICT::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

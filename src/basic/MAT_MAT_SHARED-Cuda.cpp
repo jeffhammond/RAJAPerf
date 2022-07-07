@@ -59,7 +59,7 @@ __global__ void mat_mat_shared(Index_type N, Real_ptr C, Real_ptr A,
   MAT_MAT_SHARED_BODY_4
 }
 
-void MAT_MAT_SHARED::runCudaVariant(VariantID vid) {
+void MAT_MAT_SHARED::runCudaVariant(VariantID vid, size_t tune_idx) {
 
   const Index_type run_reps = getRunReps();
   const Index_type N = m_N;

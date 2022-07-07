@@ -55,7 +55,7 @@ __global__ void muladdsub(Real_ptr out1, Real_ptr out2, Real_ptr out3,
 }
 
 
-void MULADDSUB::runCudaVariant(VariantID vid)
+void MULADDSUB::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

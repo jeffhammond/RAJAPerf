@@ -56,7 +56,7 @@ __global__ void poly_heat_3D_2(Real_ptr A, Real_ptr B, Index_type N)
 }
 
 
-void POLYBENCH_HEAT_3D::runHipVariant(VariantID vid)
+void POLYBENCH_HEAT_3D::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
 

@@ -23,7 +23,7 @@ namespace algorithm
 {
 
 
-void SORTPAIRS::runStdParVariant(VariantID vid)
+void SORTPAIRS::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

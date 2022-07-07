@@ -45,7 +45,7 @@ __global__ void mul(Real_ptr b, Real_ptr c, Real_type alpha,
   }
 }
 
-void MUL::runCudaVariant(VariantID vid)
+void MUL::runCudaVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

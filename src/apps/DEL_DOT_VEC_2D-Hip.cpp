@@ -69,7 +69,7 @@ __global__ void deldotvec2d(Real_ptr div,
 }
 
 
-void DEL_DOT_VEC_2D::runHipVariant(VariantID vid)
+void DEL_DOT_VEC_2D::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type iend = m_domain->n_real_zones;

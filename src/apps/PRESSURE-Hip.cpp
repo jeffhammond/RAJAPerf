@@ -65,7 +65,7 @@ __global__ void pressurecalc2(Real_ptr p_new, Real_ptr bvc, Real_ptr e_old,
 }
 
 
-void PRESSURE::runHipVariant(VariantID vid)
+void PRESSURE::runHipVariant(VariantID vid, size_t tune_idx)
 {
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = 0;

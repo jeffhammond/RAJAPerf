@@ -23,7 +23,7 @@ namespace rajaperf
 namespace polybench
 {
 
-void POLYBENCH_3MM::runStdParVariant(VariantID vid)
+void POLYBENCH_3MM::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 

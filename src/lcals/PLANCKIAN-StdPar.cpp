@@ -23,7 +23,7 @@ namespace lcals
 {
 
 
-void PLANCKIAN::runStdParVariant(VariantID vid)
+void PLANCKIAN::runStdParVariant(VariantID vid, size_t tune_idx)
 {
 #if defined(RUN_STDPAR)
 
