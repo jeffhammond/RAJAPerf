@@ -10,12 +10,6 @@
 
 #include "RAJA/RAJA.hpp"
 
-#ifdef USE_RANGES
-#include <ranges>
-#else
-#include <thrust/iterator/counting_iterator.h>
-#endif
-
 #include "common/StdParUtils.hpp"
 #include <algorithm>
 #include <execution>
