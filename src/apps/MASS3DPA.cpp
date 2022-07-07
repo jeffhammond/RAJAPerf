@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -69,7 +69,7 @@ MASS3DPA::~MASS3DPA()
 {
 }
 
-void MASS3DPA::setUp(VariantID vid, size_t tune_idx)
+void MASS3DPA::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
 
   allocAndInitDataConst(m_B, int(MPA_Q1D*MPA_D1D), Real_type(1.0), vid);
@@ -81,10 +81,10 @@ void MASS3DPA::setUp(VariantID vid, size_t tune_idx)
 
 void MASS3DPA::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_Y, MPA_D1D*MPA_D1D*MPA_D1D*m_NE);
+  checksum[vid][tune_idx] += calcChecksum(m_Y, MPA_D1D*MPA_D1D*MPA_D1D*m_NE);
 }
 
-void MASS3DPA::tearDown(VariantID vid, size_t tune_idx)
+void MASS3DPA::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
 

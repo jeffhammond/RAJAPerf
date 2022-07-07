@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -59,7 +59,7 @@ DIFF_PREDICT::~DIFF_PREDICT()
 {
 }
 
-void DIFF_PREDICT::setUp(VariantID vid, size_t tune_idx)
+void DIFF_PREDICT::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   m_array_length = getActualProblemSize() * 14;
   m_offset = getActualProblemSize();
@@ -70,10 +70,10 @@ void DIFF_PREDICT::setUp(VariantID vid, size_t tune_idx)
 
 void DIFF_PREDICT::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_px, m_array_length);
+  checksum[vid][tune_idx] += calcChecksum(m_px, m_array_length);
 }
 
-void DIFF_PREDICT::tearDown(VariantID vid, size_t tune_idx)
+void DIFF_PREDICT::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_px);

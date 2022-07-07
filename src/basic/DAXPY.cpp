@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -55,13 +55,15 @@ DAXPY::DAXPY(const RunParams& params)
   setVariantDefined( Base_StdPar );
   setVariantDefined( Lambda_StdPar );
   setVariantDefined( RAJA_StdPar );
+
+  setVariantDefined( Kokkos_Lambda );
 }
 
 DAXPY::~DAXPY()
 {
 }
 
-void DAXPY::setUp(VariantID vid, size_t tune_idx)
+void DAXPY::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   allocAndInitDataConst(m_y, getActualProblemSize(), 0.0, vid);
   allocAndInitData(m_x, getActualProblemSize(), vid);
@@ -70,10 +72,10 @@ void DAXPY::setUp(VariantID vid, size_t tune_idx)
 
 void DAXPY::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_y, getActualProblemSize());
+  checksum[vid].at(tune_idx) += calcChecksum(m_y, getActualProblemSize());
 }
 
-void DAXPY::tearDown(VariantID vid, size_t tune_idx)
+void DAXPY::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_x);

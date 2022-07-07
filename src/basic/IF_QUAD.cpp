@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -26,7 +26,7 @@ IF_QUAD::IF_QUAD(const RunParams& params)
 
   setActualProblemSize( getTargetProblemSize() );
 
-  setItsPerRep( getActualProblemSize() ); 
+  setItsPerRep( getActualProblemSize() );
   setKernelsPerRep(1);
   setBytesPerRep( (2*sizeof(Real_type) + 3*sizeof(Real_type)) * getActualProblemSize() );
   setFLOPsPerRep(11 * getActualProblemSize()); // 1 sqrt
@@ -59,13 +59,15 @@ IF_QUAD::IF_QUAD(const RunParams& params)
   setVariantDefined( Base_StdPar );
   setVariantDefined( Lambda_StdPar );
   setVariantDefined( RAJA_StdPar );
+
+  setVariantDefined( Kokkos_Lambda );
 }
 
 IF_QUAD::~IF_QUAD()
 {
 }
 
-void IF_QUAD::setUp(VariantID vid, size_t tune_idx)
+void IF_QUAD::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   allocAndInitDataRandSign(m_a, getActualProblemSize(), vid);
   allocAndInitData(m_b, getActualProblemSize(), vid);
@@ -76,11 +78,11 @@ void IF_QUAD::setUp(VariantID vid, size_t tune_idx)
 
 void IF_QUAD::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_x1, getActualProblemSize(), checksum_scale_factor );
-  checksum[vid] += calcChecksum(m_x2, getActualProblemSize(), checksum_scale_factor );
+  checksum[vid][tune_idx] += calcChecksum(m_x1, getActualProblemSize(), checksum_scale_factor );
+  checksum[vid][tune_idx] += calcChecksum(m_x2, getActualProblemSize(), checksum_scale_factor );
 }
 
-void IF_QUAD::tearDown(VariantID vid, size_t tune_idx)
+void IF_QUAD::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_a);

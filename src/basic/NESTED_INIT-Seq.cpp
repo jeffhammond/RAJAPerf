@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -12,13 +12,13 @@
 
 #include <iostream>
 
-namespace rajaperf 
+namespace rajaperf
 {
 namespace basic
 {
 
 
-void NESTED_INIT::runSeqVariant(VariantID vid, size_t tune_idx)
+void NESTED_INIT::runSeqVariant(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   const Index_type run_reps = getRunReps();
 
@@ -72,7 +72,7 @@ void NESTED_INIT::runSeqVariant(VariantID vid, size_t tune_idx)
 
     case RAJA_Seq : {
 
-      using EXEC_POL = 
+      using EXEC_POL =
         RAJA::KernelPolicy<
           RAJA::statement::For<2, RAJA::loop_exec,    // k
             RAJA::statement::For<1, RAJA::loop_exec,  // j
@@ -100,7 +100,7 @@ void NESTED_INIT::runSeqVariant(VariantID vid, size_t tune_idx)
 #endif // RUN_RAJA_SEQ
 
     default : {
-      std::cout << "\n  NESTED_INIT : Unknown variant id = " << vid << std::endl;
+      getCout() << "\n  NESTED_INIT : Unknown variant id = " << vid << std::endl;
     }
 
   }

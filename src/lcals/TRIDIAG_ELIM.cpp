@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -61,7 +61,7 @@ TRIDIAG_ELIM::~TRIDIAG_ELIM()
 {
 }
 
-void TRIDIAG_ELIM::setUp(VariantID vid, size_t tune_idx)
+void TRIDIAG_ELIM::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   allocAndInitDataConst(m_xout, m_N, 0.0, vid);
   allocAndInitData(m_xin, m_N, vid);
@@ -71,10 +71,10 @@ void TRIDIAG_ELIM::setUp(VariantID vid, size_t tune_idx)
 
 void TRIDIAG_ELIM::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_xout, getActualProblemSize());
+  checksum[vid][tune_idx] += calcChecksum(m_xout, getActualProblemSize());
 }
 
-void TRIDIAG_ELIM::tearDown(VariantID vid, size_t tune_idx)
+void TRIDIAG_ELIM::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_xout);

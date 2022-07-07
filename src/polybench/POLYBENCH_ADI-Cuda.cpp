@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -21,11 +21,6 @@ namespace rajaperf
 namespace polybench
 {
 
-//
-// Define thread block size for CUDA execution
-//
-const size_t block_size = 256;
-
 #define POLYBENCH_ADI_DATA_SETUP_CUDA \
   allocAndInitCudaDeviceData(U, m_U, m_n * m_n); \
   allocAndInitCudaDeviceData(V, m_V, m_n * m_n); \
@@ -40,12 +35,14 @@ const size_t block_size = 256;
   deallocCudaDeviceData(Q);
 
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void adi1(const Index_type n,
                      const Real_type a, const Real_type b, const Real_type c,
                      const Real_type d, const Real_type f,
                      Real_ptr P, Real_ptr Q, Real_ptr U, Real_ptr V)
 {
-  Index_type i = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
   if (i < n-1) {
     POLYBENCH_ADI_BODY2;
     for (Index_type j = 1; j < n-1; ++j) {
@@ -58,12 +55,14 @@ __global__ void adi1(const Index_type n,
   }
 }
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void adi2(const Index_type n,
                      const Real_type a, const Real_type c, const Real_type d,
                      const Real_type e, const Real_type f,
                      Real_ptr P, Real_ptr Q, Real_ptr U, Real_ptr V)
 {
-  Index_type i = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
   if (i < n-1) {
     POLYBENCH_ADI_BODY6;
     for (Index_type j = 1; j < n-1; ++j) {
@@ -76,8 +75,20 @@ __global__ void adi2(const Index_type n,
   }
 }
 
+template < size_t block_size, typename Lambda >
+__launch_bounds__(block_size)
+__global__ void adi_lam(const Index_type n,
+                        Lambda body)
+{
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
+  if (i < n-1) {
+    body(i);
+  }
+}
 
-void POLYBENCH_ADI::runCudaVariant(VariantID vid, size_t tune_idx)
+
+template < size_t block_size >
+void POLYBENCH_ADI::runCudaVariantImpl(VariantID vid)
 {
   const Index_type run_reps = getRunReps();
 
@@ -94,12 +105,12 @@ void POLYBENCH_ADI::runCudaVariant(VariantID vid, size_t tune_idx)
 
         const size_t grid_size = RAJA_DIVIDE_CEILING_INT(n-2, block_size);
 
-        adi1<<<grid_size, block_size>>>(n,
+        adi1<block_size><<<grid_size, block_size>>>(n,
                                         a, b, c, d, f,
                                         P, Q, U, V);
         cudaErrchk( cudaGetLastError() );
 
-        adi2<<<grid_size, block_size>>>(n,
+        adi2<block_size><<<grid_size, block_size>>>(n,
                                         a, c, d, e, f,
                                         P, Q, U, V);
         cudaErrchk( cudaGetLastError() );
@@ -122,35 +133,34 @@ void POLYBENCH_ADI::runCudaVariant(VariantID vid, size_t tune_idx)
 
         const size_t grid_size = RAJA_DIVIDE_CEILING_INT(n-2, block_size);
 
-        lambda_cuda_forall<<<grid_size, block_size>>>(
-          1, n-1,
+        adi_lam<block_size><<<grid_size, block_size>>>(n,
           [=] __device__ (Index_type i) {
-
-          POLYBENCH_ADI_BODY2;
-          for (Index_type j = 1; j < n-1; ++j) {
-             POLYBENCH_ADI_BODY3;
+            POLYBENCH_ADI_BODY2;
+            for (Index_type j = 1; j < n-1; ++j) {
+              POLYBENCH_ADI_BODY3;
+            }
+            POLYBENCH_ADI_BODY4;
+            for (Index_type k = n-2; k >= 1; --k) {
+              POLYBENCH_ADI_BODY5;
+            }
           }
-          POLYBENCH_ADI_BODY4;
-          for (Index_type k = n-2; k >= 1; --k) {
-             POLYBENCH_ADI_BODY5;
-          }
-        });
+        );
         cudaErrchk( cudaGetLastError() );
 
-        lambda_cuda_forall<<<grid_size, block_size>>>(
-          1, n-1,
+        adi_lam<block_size><<<grid_size, block_size>>>(n,
           [=] __device__ (Index_type i) {
-
-          POLYBENCH_ADI_BODY6;
-          for (Index_type j = 1; j < n-1; ++j) {
-            POLYBENCH_ADI_BODY7;
+            POLYBENCH_ADI_BODY6;
+            for (Index_type j = 1; j < n-1; ++j) {
+              POLYBENCH_ADI_BODY7;
+            }
+            POLYBENCH_ADI_BODY8;
+            for (Index_type k = n-2; k >= 1; --k) {
+              POLYBENCH_ADI_BODY9;
+            }
           }
-          POLYBENCH_ADI_BODY8;
-          for (Index_type k = n-2; k >= 1; --k) {
-            POLYBENCH_ADI_BODY9;
-          }
-        });
+        );
         cudaErrchk( cudaGetLastError() );
+
       }  // tstep loop
 
     }
@@ -166,7 +176,7 @@ void POLYBENCH_ADI::runCudaVariant(VariantID vid, size_t tune_idx)
 
     using EXEC_POL =
       RAJA::KernelPolicy<
-        RAJA::statement::CudaKernelAsync<
+        RAJA::statement::CudaKernelFixedAsync<block_size,
           RAJA::statement::Tile<0, RAJA::tile_fixed<block_size>,
                                    RAJA::cuda_block_x_direct,
             RAJA::statement::For<0, RAJA::cuda_thread_x_direct,
@@ -234,9 +244,11 @@ void POLYBENCH_ADI::runCudaVariant(VariantID vid, size_t tune_idx)
     POLYBENCH_ADI_TEARDOWN_CUDA
 
   } else {
-      std::cout << "\n  POLYBENCH_ADI : Unknown Cuda variant id = " << vid << std::endl;
+      getCout() << "\n  POLYBENCH_ADI : Unknown Cuda variant id = " << vid << std::endl;
   }
 }
+
+RAJAPERF_GPU_BLOCK_SIZE_TUNING_DEFINE_BIOLERPLATE(POLYBENCH_ADI, Cuda)
 
 } // end namespace polybench
 } // end namespace rajaperf

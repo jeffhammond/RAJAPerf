@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+# Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 # and RAJA Performance Suite project contributors.
 # See the RAJAPerf/LICENSE file for details.
 #
@@ -15,6 +15,12 @@ blt_add_library(
           DAXPY-Cuda.cpp
           DAXPY-OMP.cpp
           DAXPY-OMPTarget.cpp
+          DAXPY_ATOMIC.cpp
+          DAXPY_ATOMIC-Seq.cpp
+          DAXPY_ATOMIC-Hip.cpp
+          DAXPY_ATOMIC-Cuda.cpp
+          DAXPY_ATOMIC-OMP.cpp
+          DAXPY_ATOMIC-OMPTarget.cpp
           IF_QUAD.cpp
           IF_QUAD-Seq.cpp
           IF_QUAD-StdPar.cpp
@@ -22,6 +28,18 @@ blt_add_library(
           IF_QUAD-Cuda.cpp
           IF_QUAD-OMP.cpp
           IF_QUAD-OMPTarget.cpp
+          INDEXLIST.cpp
+          INDEXLIST-Seq.cpp
+          INDEXLIST-Hip.cpp
+          INDEXLIST-Cuda.cpp
+          INDEXLIST-OMP.cpp
+          INDEXLIST-OMPTarget.cpp
+          INDEXLIST_3LOOP.cpp
+          INDEXLIST_3LOOP-Seq.cpp
+          INDEXLIST_3LOOP-Hip.cpp
+          INDEXLIST_3LOOP-Cuda.cpp
+          INDEXLIST_3LOOP-OMP.cpp
+          INDEXLIST_3LOOP-OMPTarget.cpp
           INIT3.cpp
           INIT3-Seq.cpp
           INIT3-Hip.cpp
@@ -84,6 +102,12 @@ blt_add_library(
           REDUCE3_INT-Cuda.cpp
           REDUCE3_INT-OMP.cpp
           REDUCE3_INT-OMPTarget.cpp
+          REDUCE_STRUCT.cpp
+          REDUCE_STRUCT-Seq.cpp
+          REDUCE_STRUCT-Hip.cpp
+          REDUCE_STRUCT-Cuda.cpp
+          REDUCE_STRUCT-OMP.cpp
+          REDUCE_STRUCT-OMPTarget.cpp
           TRAP_INT.cpp
           TRAP_INT-Seq.cpp
           TRAP_INT-StdPar.cpp

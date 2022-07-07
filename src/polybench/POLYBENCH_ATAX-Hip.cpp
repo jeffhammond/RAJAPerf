@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -21,11 +21,6 @@ namespace rajaperf
 namespace polybench
 {
 
-  //
-  // Define thread block size for HIP execution
-  //
-  const size_t block_size = 256;
-
 #define POLYBENCH_ATAX_DATA_SETUP_HIP \
   allocAndInitHipDeviceData(tmp, m_tmp, N); \
   allocAndInitHipDeviceData(y, m_y, N); \
@@ -41,10 +36,12 @@ namespace polybench
   deallocHipDeviceData(A);
 
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void poly_atax_1(Real_ptr A, Real_ptr x, Real_ptr y, Real_ptr tmp,
                             Index_type N)
 {
-   Index_type i = blockIdx.x * blockDim.x + threadIdx.x;
+   Index_type i = blockIdx.x * block_size + threadIdx.x;
 
    if (i < N) {
      POLYBENCH_ATAX_BODY1;
@@ -55,10 +52,12 @@ __global__ void poly_atax_1(Real_ptr A, Real_ptr x, Real_ptr y, Real_ptr tmp,
    }
 }
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void poly_atax_2(Real_ptr A, Real_ptr tmp, Real_ptr y,
                             Index_type N)
 {
-   Index_type j = blockIdx.x * blockDim.x + threadIdx.x;
+   Index_type j = blockIdx.x * block_size + threadIdx.x;
 
    if (j < N) {
      POLYBENCH_ATAX_BODY4;
@@ -69,8 +68,21 @@ __global__ void poly_atax_2(Real_ptr A, Real_ptr tmp, Real_ptr y,
    }
 }
 
+template < size_t block_size, typename Lambda >
+__launch_bounds__(block_size)
+__global__ void poly_atax_lam(Index_type N,
+                              Lambda body)
+{
+  Index_type ti = blockIdx.x * block_size + threadIdx.x;
 
-void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
+  if (ti < N) {
+    body(ti);
+  }
+}
+
+
+template < size_t block_size >
+void POLYBENCH_ATAX::runHipVariantImpl(VariantID vid)
 {
   const Index_type run_reps = getRunReps();
 
@@ -85,12 +97,14 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
 
       const size_t grid_size = RAJA_DIVIDE_CEILING_INT(N, block_size);
 
-      hipLaunchKernelGGL((poly_atax_1), dim3(grid_size), dim3(block_size), 0, 0,
-                                      A, x, y, tmp, N);
+      hipLaunchKernelGGL((poly_atax_1<block_size>),
+                         dim3(grid_size), dim3(block_size), 0, 0,
+                         A, x, y, tmp, N);
       hipErrchk( hipGetLastError() );
 
-      hipLaunchKernelGGL((poly_atax_2), dim3(grid_size), dim3(block_size), 0, 0,
-                                      A, tmp, y, N);
+      hipLaunchKernelGGL((poly_atax_2<block_size>),
+                         dim3(grid_size), dim3(block_size), 0, 0,
+                         A, tmp, y, N);
       hipErrchk( hipGetLastError() );
 
     }
@@ -108,7 +122,6 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
       const size_t grid_size = RAJA_DIVIDE_CEILING_INT(N, block_size);
 
       auto poly_atax_1_lambda = [=] __device__ (Index_type i) {
-
         POLYBENCH_ATAX_BODY1;
         for (Index_type j = 0; j < N; ++j ) {
           POLYBENCH_ATAX_BODY2;
@@ -116,13 +129,12 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
         POLYBENCH_ATAX_BODY3;
       };
 
-      hipLaunchKernelGGL(lambda_hip_forall<decltype(poly_atax_1_lambda)>,
-        grid_size, block_size, 0, 0,
-        0, N, poly_atax_1_lambda);
+      hipLaunchKernelGGL((poly_atax_lam<block_size, decltype(poly_atax_1_lambda)>),
+        dim3(grid_size), dim3(block_size), 0, 0,
+        N, poly_atax_1_lambda);
       hipErrchk( hipGetLastError() );
 
       auto poly_atax_2_lambda = [=] __device__ (Index_type j) {
-
         POLYBENCH_ATAX_BODY4;
         for (Index_type i = 0; i < N; ++i ) {
           POLYBENCH_ATAX_BODY5;
@@ -130,9 +142,9 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
         POLYBENCH_ATAX_BODY6;
       };
 
-      hipLaunchKernelGGL(lambda_hip_forall<decltype(poly_atax_2_lambda)>,
-        grid_size, block_size, 0, 0,
-        0, N, poly_atax_2_lambda);
+      hipLaunchKernelGGL((poly_atax_lam<block_size, decltype(poly_atax_2_lambda)>),
+        dim3(grid_size), dim3(block_size), 0, 0,
+        N, poly_atax_2_lambda);
       hipErrchk( hipGetLastError() );
 
     }
@@ -148,7 +160,7 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
 
     using EXEC_POL1 =
       RAJA::KernelPolicy<
-        RAJA::statement::HipKernelAsync<
+        RAJA::statement::HipKernelFixedAsync<block_size,
           RAJA::statement::Tile<0, RAJA::tile_fixed<block_size>,
                                    RAJA::hip_block_x_direct,
             RAJA::statement::For<0, RAJA::hip_thread_x_direct,
@@ -164,7 +176,7 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
 
     using EXEC_POL2 =
       RAJA::KernelPolicy<
-        RAJA::statement::HipKernelAsync<
+        RAJA::statement::HipKernelFixedAsync<block_size,
           RAJA::statement::Tile<1, RAJA::tile_fixed<block_size>,
                                    RAJA::hip_block_x_direct,
             RAJA::statement::For<1, RAJA::hip_thread_x_direct,
@@ -221,10 +233,11 @@ void POLYBENCH_ATAX::runHipVariant(VariantID vid, size_t tune_idx)
     POLYBENCH_ATAX_TEARDOWN_HIP;
 
   } else {
-      std::cout << "\n  POLYBENCH_ATAX : Unknown Hip variant id = " << vid << std::endl;
+      getCout() << "\n  POLYBENCH_ATAX : Unknown Hip variant id = " << vid << std::endl;
   }
-
 }
+
+RAJAPERF_GPU_BLOCK_SIZE_TUNING_DEFINE_BIOLERPLATE(POLYBENCH_ATAX, Hip)
 
 } // end namespace polybench
 } // end namespace rajaperf

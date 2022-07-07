@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -89,7 +89,7 @@ POLYBENCH_GEMVER::~POLYBENCH_GEMVER()
 {
 }
 
-void POLYBENCH_GEMVER::setUp(VariantID vid, size_t tune_idx)
+void POLYBENCH_GEMVER::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
 
@@ -106,10 +106,10 @@ void POLYBENCH_GEMVER::setUp(VariantID vid, size_t tune_idx)
 
 void POLYBENCH_GEMVER::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_w, m_n, checksum_scale_factor );
+  checksum[vid][tune_idx] += calcChecksum(m_w, m_n, checksum_scale_factor );
 }
 
-void POLYBENCH_GEMVER::tearDown(VariantID vid, size_t tune_idx)
+void POLYBENCH_GEMVER::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_A);

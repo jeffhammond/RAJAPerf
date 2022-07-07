@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -21,7 +21,7 @@ POLYBENCH_ADI::POLYBENCH_ADI(const RunParams& params)
   : KernelBase(rajaperf::Polybench_ADI, params)
 {
   Index_type n_default = 1000;
-  
+
   setDefaultProblemSize( (n_default-2) * (n_default-2) );
   setDefaultReps(4);
 
@@ -39,7 +39,7 @@ POLYBENCH_ADI::POLYBENCH_ADI(const RunParams& params)
   setFLOPsPerRep( m_tsteps * ( (15 + 2) * (m_n-2)*(m_n-2) +
                                (15 + 2) * (m_n-2)*(m_n-2) ) );
 
-  checksum_scale_factor = 0.0000001 * 
+  checksum_scale_factor = 0.0000001 *
               ( static_cast<Checksum_type>(getDefaultProblemSize()) /
                                            getActualProblemSize() );
 
@@ -73,7 +73,7 @@ POLYBENCH_ADI::~POLYBENCH_ADI()
 {
 }
 
-void POLYBENCH_ADI::setUp(VariantID vid, size_t tune_idx)
+void POLYBENCH_ADI::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   allocAndInitDataConst(m_U, m_n * m_n, 0.0, vid);
   allocAndInitData(m_V, m_n * m_n, vid);
@@ -83,10 +83,10 @@ void POLYBENCH_ADI::setUp(VariantID vid, size_t tune_idx)
 
 void POLYBENCH_ADI::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_U, m_n * m_n, checksum_scale_factor );
+  checksum[vid][tune_idx] += calcChecksum(m_U, m_n * m_n, checksum_scale_factor );
 }
 
-void POLYBENCH_ADI::tearDown(VariantID vid, size_t tune_idx)
+void POLYBENCH_ADI::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
   deallocData(m_U);

@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -33,7 +33,7 @@ FIR::FIR(const RunParams& params)
   setBytesPerRep( (1*sizeof(Real_type) + 0*sizeof(Real_type)) * getItsPerRep() +
                   (0*sizeof(Real_type) + 1*sizeof(Real_type)) * getActualProblemSize() );
   setFLOPsPerRep((2 * m_coefflen) * (getActualProblemSize() - m_coefflen));
- 
+
   checksum_scale_factor = 0.0001 *
               ( static_cast<Checksum_type>(getDefaultProblemSize()) /
                                            getActualProblemSize() );
@@ -66,7 +66,7 @@ FIR::~FIR()
 {
 }
 
-void FIR::setUp(VariantID vid, size_t tune_idx)
+void FIR::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   allocAndInitData(m_in, getActualProblemSize(), vid);
   allocAndInitDataConst(m_out, getActualProblemSize(), 0.0, vid);
@@ -74,10 +74,10 @@ void FIR::setUp(VariantID vid, size_t tune_idx)
 
 void FIR::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid] += calcChecksum(m_out, getActualProblemSize(), checksum_scale_factor );
+  checksum[vid][tune_idx] += calcChecksum(m_out, getActualProblemSize(), checksum_scale_factor );
 }
 
-void FIR::tearDown(VariantID vid, size_t tune_idx)
+void FIR::tearDown(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
   (void) vid;
 

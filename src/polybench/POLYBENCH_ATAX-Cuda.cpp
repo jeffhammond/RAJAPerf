@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -21,11 +21,6 @@ namespace rajaperf
 namespace polybench
 {
 
-  //
-  // Define thread block size for CUDA execution
-  //
-  const size_t block_size = 256;
-
 #define POLYBENCH_ATAX_DATA_SETUP_CUDA \
   allocAndInitCudaDeviceData(tmp, m_tmp, N); \
   allocAndInitCudaDeviceData(y, m_y, N); \
@@ -41,10 +36,12 @@ namespace polybench
   deallocCudaDeviceData(A);
 
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void poly_atax_1(Real_ptr A, Real_ptr x, Real_ptr y, Real_ptr tmp,
                             Index_type N)
 {
-  Index_type i = blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = blockIdx.x * block_size + threadIdx.x;
 
   if (i < N) {
     POLYBENCH_ATAX_BODY1;
@@ -55,10 +52,12 @@ __global__ void poly_atax_1(Real_ptr A, Real_ptr x, Real_ptr y, Real_ptr tmp,
   }
 }
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void poly_atax_2(Real_ptr A, Real_ptr tmp, Real_ptr y,
                             Index_type N)
 {
-  Index_type j = blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type j = blockIdx.x * block_size + threadIdx.x;
 
   if (j < N) {
     POLYBENCH_ATAX_BODY4;
@@ -69,8 +68,21 @@ __global__ void poly_atax_2(Real_ptr A, Real_ptr tmp, Real_ptr y,
   }
 }
 
+template < size_t block_size, typename Lambda >
+__launch_bounds__(block_size)
+__global__ void poly_atax_lam(Index_type N,
+                              Lambda body)
+{
+  Index_type ti = blockIdx.x * block_size + threadIdx.x;
 
-void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
+  if (ti < N) {
+    body(ti);
+  }
+}
+
+
+template < size_t block_size >
+void POLYBENCH_ATAX::runCudaVariantImpl(VariantID vid)
 {
   const Index_type run_reps = getRunReps();
 
@@ -85,10 +97,10 @@ void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
 
       const size_t grid_size = RAJA_DIVIDE_CEILING_INT(N, block_size);
 
-      poly_atax_1<<<grid_size, block_size>>>(A, x, y, tmp, N);
+      poly_atax_1<block_size><<<grid_size, block_size>>>(A, x, y, tmp, N);
       cudaErrchk( cudaGetLastError() );
 
-      poly_atax_2<<<grid_size, block_size>>>(A, tmp, y, N);
+      poly_atax_2<block_size><<<grid_size, block_size>>>(A, tmp, y, N);
       cudaErrchk( cudaGetLastError() );
 
     }
@@ -105,28 +117,26 @@ void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
 
       const size_t grid_size = RAJA_DIVIDE_CEILING_INT(N, block_size);
 
-      lambda_cuda_forall<<<grid_size, block_size>>>(
-        0, N,
+      poly_atax_lam<block_size><<<grid_size, block_size>>>(N,
         [=] __device__ (Index_type i) {
-
-        POLYBENCH_ATAX_BODY1;
-        for (Index_type j = 0; j < N; ++j ) {
-          POLYBENCH_ATAX_BODY2;
+          POLYBENCH_ATAX_BODY1;
+          for (Index_type j = 0; j < N; ++j ) {
+            POLYBENCH_ATAX_BODY2;
+          }
+          POLYBENCH_ATAX_BODY3;
         }
-        POLYBENCH_ATAX_BODY3;
-      });
+      );
       cudaErrchk( cudaGetLastError() );
 
-      lambda_cuda_forall<<<grid_size, block_size>>>(
-        0, N,
+      poly_atax_lam<block_size><<<grid_size, block_size>>>(N,
         [=] __device__ (Index_type j) {
-
-        POLYBENCH_ATAX_BODY4;
-        for (Index_type i = 0; i < N; ++i ) {
-          POLYBENCH_ATAX_BODY5;
+          POLYBENCH_ATAX_BODY4;
+          for (Index_type i = 0; i < N; ++i ) {
+            POLYBENCH_ATAX_BODY5;
+          }
+          POLYBENCH_ATAX_BODY6;
         }
-        POLYBENCH_ATAX_BODY6;
-      });
+      );
       cudaErrchk( cudaGetLastError() );
 
     }
@@ -142,7 +152,7 @@ void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
 
     using EXEC_POL1 =
       RAJA::KernelPolicy<
-        RAJA::statement::CudaKernelAsync<
+        RAJA::statement::CudaKernelFixedAsync<block_size,
           RAJA::statement::Tile<0, RAJA::tile_fixed<block_size>,
                                    RAJA::cuda_block_x_direct,
             RAJA::statement::For<0, RAJA::cuda_thread_x_direct,
@@ -158,7 +168,7 @@ void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
 
     using EXEC_POL2 =
       RAJA::KernelPolicy<
-        RAJA::statement::CudaKernelAsync<
+        RAJA::statement::CudaKernelFixedAsync<block_size,
           RAJA::statement::Tile<1, RAJA::tile_fixed<block_size>,
                                    RAJA::cuda_block_x_direct,
             RAJA::statement::For<1, RAJA::cuda_thread_x_direct,
@@ -216,10 +226,11 @@ void POLYBENCH_ATAX::runCudaVariant(VariantID vid, size_t tune_idx)
     POLYBENCH_ATAX_TEARDOWN_CUDA;
 
   } else {
-      std::cout << "\n  POLYBENCH_ATAX : Unknown Cuda variant id = " << vid << std::endl;
+      getCout() << "\n  POLYBENCH_ATAX : Unknown Cuda variant id = " << vid << std::endl;
   }
-
 }
+
+RAJAPERF_GPU_BLOCK_SIZE_TUNING_DEFINE_BIOLERPLATE(POLYBENCH_ATAX, Cuda)
 
 } // end namespace polybench
 } // end namespace rajaperf

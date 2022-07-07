@@ -1,5 +1,5 @@
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-// Copyright (c) 2017-21, Lawrence Livermore National Security, LLC
+// Copyright (c) 2017-22, Lawrence Livermore National Security, LLC
 // and RAJA Performance Suite project contributors.
 // See the RAJAPerf/LICENSE file for details.
 //
@@ -21,11 +21,6 @@ namespace rajaperf
 namespace polybench
 {
 
-//
-// Define thread block size for HIP execution
-//
-const size_t block_size = 256;
-
 #define POLYBENCH_ADI_DATA_SETUP_HIP \
   allocAndInitHipDeviceData(U, m_U, m_n * m_n); \
   allocAndInitHipDeviceData(V, m_V, m_n * m_n); \
@@ -41,12 +36,14 @@ const size_t block_size = 256;
   deallocHipDeviceData(Q);
 
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void adi1(const Index_type n,
                      const Real_type a, const Real_type b, const Real_type c,
                      const Real_type d, const Real_type f,
                      Real_ptr P, Real_ptr Q, Real_ptr U, Real_ptr V)
 {
-  Index_type i = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
   if (i < n-1) {
     POLYBENCH_ADI_BODY2;
     for (Index_type j = 1; j < n-1; ++j) {
@@ -59,12 +56,14 @@ __global__ void adi1(const Index_type n,
   }
 }
 
+template < size_t block_size >
+__launch_bounds__(block_size)
 __global__ void adi2(const Index_type n,
                      const Real_type a, const Real_type c, const Real_type d,
                      const Real_type e, const Real_type f,
                      Real_ptr P, Real_ptr Q, Real_ptr U, Real_ptr V)
 {
-  Index_type i = 1 + blockIdx.x * blockDim.x + threadIdx.x;
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
   if (i < n-1) {
     POLYBENCH_ADI_BODY6;
     for (Index_type j = 1; j < n-1; ++j) {
@@ -77,8 +76,20 @@ __global__ void adi2(const Index_type n,
   }
 }
 
+template < size_t block_size, typename Lambda >
+__launch_bounds__(block_size)
+__global__ void adi_lam(const Index_type n,
+                        Lambda body)
+{
+  Index_type i = 1 + blockIdx.x * block_size + threadIdx.x;
+  if (i < n-1) {
+    body(i);
+  }
+}
 
-void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
+
+template < size_t block_size >
+void POLYBENCH_ADI::runHipVariantImpl(VariantID vid)
 {
   const Index_type run_reps = getRunReps();
 
@@ -95,16 +106,18 @@ void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
 
         const size_t grid_size = RAJA_DIVIDE_CEILING_INT(n-2, block_size);
 
-        hipLaunchKernelGGL((adi1), dim3(grid_size), dim3(block_size), 0, 0,
-                                        n,
-                                        a, b, c, d, f,
-                                        P, Q, U, V);
+        hipLaunchKernelGGL((adi1<block_size>),
+                           dim3(grid_size), dim3(block_size), 0, 0,
+                           n,
+                           a, b, c, d, f,
+                           P, Q, U, V);
         hipErrchk( hipGetLastError() );
 
-        hipLaunchKernelGGL((adi2), dim3(grid_size), dim3(block_size), 0, 0,
-                                        n,
-                                        a, c, d, e, f,
-                                        P, Q, U, V);
+        hipLaunchKernelGGL((adi2<block_size>),
+                           dim3(grid_size), dim3(block_size), 0, 0,
+                           n,
+                           a, c, d, e, f,
+                           P, Q, U, V);
         hipErrchk( hipGetLastError() );
 
       }  // tstep loop
@@ -126,7 +139,6 @@ void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
         const size_t grid_size = RAJA_DIVIDE_CEILING_INT(n-2, block_size);
 
         auto adi1_lamda = [=] __device__ (Index_type i) {
-
           POLYBENCH_ADI_BODY2;
           for (Index_type j = 1; j < n-1; ++j) {
              POLYBENCH_ADI_BODY3;
@@ -137,13 +149,12 @@ void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
           }
         };
 
-        hipLaunchKernelGGL(lambda_hip_forall<decltype(adi1_lamda)>,
-          grid_size, block_size, 0, 0,
-          1, n-1, adi1_lamda);
+        hipLaunchKernelGGL((adi_lam<block_size, decltype(adi1_lamda)>),
+                           dim3(grid_size), dim3(block_size), 0, 0,
+                           n, adi1_lamda);
         hipErrchk( hipGetLastError() );
 
         auto adi2_lamda = [=] __device__ (Index_type i) {
-
           POLYBENCH_ADI_BODY6;
           for (Index_type j = 1; j < n-1; ++j) {
             POLYBENCH_ADI_BODY7;
@@ -154,9 +165,9 @@ void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
           }
         };
 
-        hipLaunchKernelGGL(lambda_hip_forall<decltype(adi2_lamda)>,
-          grid_size, block_size, 0, 0,
-          1, n-1, adi2_lamda);
+        hipLaunchKernelGGL((adi_lam<block_size, decltype(adi2_lamda)>),
+                           dim3(grid_size), dim3(block_size), 0, 0,
+                           n, adi2_lamda);
         hipErrchk( hipGetLastError() );
 
       }  // tstep loop
@@ -242,9 +253,11 @@ void POLYBENCH_ADI::runHipVariant(VariantID vid, size_t tune_idx)
     POLYBENCH_ADI_TEARDOWN_HIP
 
   } else {
-      std::cout << "\n  POLYBENCH_ADI : Unknown Hip variant id = " << vid << std::endl;
+      getCout() << "\n  POLYBENCH_ADI : Unknown Hip variant id = " << vid << std::endl;
   }
 }
+
+RAJAPERF_GPU_BLOCK_SIZE_TUNING_DEFINE_BIOLERPLATE(POLYBENCH_ADI, Hip)
 
 } // end namespace polybench
 } // end namespace rajaperf
