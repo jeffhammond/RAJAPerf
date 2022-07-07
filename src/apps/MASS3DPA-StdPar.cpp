@@ -222,7 +222,7 @@ void MASS3DPA::runStdParVariant(VariantID vid) {
 #endif // RUN_RAJA_STDPAR
 
   default:
-    std::cout << "\n MASS3DPA : Unknown Seq variant id = " << vid << std::endl;
+    std::cout << "\n MASS3DPA : Unknown StdPar variant id = " << vid << std::endl;
   }
 #endif
 }
