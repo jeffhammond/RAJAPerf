@@ -139,13 +139,7 @@ public:
   void runCudaVariant(VariantID vid, size_t tune_idx);
   void runHipVariant(VariantID vid, size_t tune_idx);
   void runOpenMPTargetVariant(VariantID vid, size_t tune_idx);
-
-  void runSeqVariant(VariantID vid);
-  void runOpenMPVariant(VariantID vid);
-  void runCudaVariant(VariantID vid);
-  void runHipVariant(VariantID vid);
-  void runOpenMPTargetVariant(VariantID vid);
-  void runStdParVariant(VariantID vid);
+  void runStdParVariant(VariantID vid, size_t tune_idx);
 
   void setCudaTuningDefinitions(VariantID vid);
   void setHipTuningDefinitions(VariantID vid);

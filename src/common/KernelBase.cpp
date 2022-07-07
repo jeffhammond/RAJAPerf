@@ -250,7 +250,7 @@ void KernelBase::runKernel(VariantID vid, size_t tune_idx)
     case Base_StdPar :
     case Lambda_StdPar :
     {
-      runStdParVariant(vid);
+      runStdParVariant(vid, tune_idx);
       break;
     }
 
