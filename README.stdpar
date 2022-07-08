@@ -1,0 +1,4 @@
+# GCC
+
+# NVC++
+cmake .. -DCMAKE_CXX_COMPILER=nvc++ -DCMAKE_CXX_FLAGS="--c++20 -stdpar=gpu -gpu=managed" -DENABLE_STDPAR=1
