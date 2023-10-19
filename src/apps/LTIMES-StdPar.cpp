@@ -103,6 +103,9 @@ void LTIMES::runStdParVariant(VariantID vid, size_t tune_idx)
     }
 
   }
+
+#else
+  RAJA_UNUSED_VAR(vid);
 #endif
 }
 
