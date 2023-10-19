@@ -16,7 +16,8 @@
 
 #include <iostream>
 
-namespace rajaperf 
+
+namespace rajaperf
 {
 namespace polybench
 {
@@ -84,8 +85,6 @@ void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid, size_t tune_idx)
       }
       stopTimer();
 
-      POLYBENCH_JACOBI_2D_DATA_RESET;
-
       break;
     }
 
@@ -148,8 +147,6 @@ void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid, size_t tune_idx)
       }
       stopTimer();
 
-      POLYBENCH_JACOBI_2D_DATA_RESET;
-
       break;
     }
 
@@ -166,4 +163,3 @@ void POLYBENCH_JACOBI_2D::runStdParVariant(VariantID vid, size_t tune_idx)
 } // end namespace rajaperf
 
 #endif  // BUILD_STDPAR
-
