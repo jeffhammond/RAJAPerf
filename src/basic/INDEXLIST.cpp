@@ -46,11 +46,16 @@ INDEXLIST::INDEXLIST(const RunParams& params)
   setVariantDefined( Base_OpenMPTarget );
 #endif
 
-  setVariantDefined( Base_CUDA );
+  setVariantDefined( Base_StdPar );
+
+  if (params.getAllowProblematicImplementations()) {
+    // these may deadlock depending on the order that blocks are scheduled
 
   setVariantDefined( Base_HIP );
 
-  //setVariantDefined( Base_StdPar );
+  setVariantDefined( Base_CUDA );
+
+  }
 }
 
 INDEXLIST::~INDEXLIST()
@@ -66,7 +71,7 @@ void INDEXLIST::setUp(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 
 void INDEXLIST::updateChecksum(VariantID vid, size_t tune_idx)
 {
-  checksum[vid][tune_idx] += calcChecksum(m_list, getActualProblemSize());
+  checksum[vid][tune_idx] += calcChecksum(m_list, getActualProblemSize(), vid);
   checksum[vid][tune_idx] += Checksum_type(m_len);
 }
 
