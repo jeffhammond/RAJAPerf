@@ -50,13 +50,11 @@ static inline void std::__throw_bad_array_new_length() { std::abort(); }
 #include <openacc.h>
 #endif
 
-// this is a hack to override the false-positive error for random-access iterators
+#include <type_traits>
+#include <iterator>
 #include <execution>
-#define _ASSERT_RANDOM_ACCESS
-
 #include <algorithm>
 #include <numeric>
-#include <type_traits>
 
 // This implementation was authored by David Olsen
 
