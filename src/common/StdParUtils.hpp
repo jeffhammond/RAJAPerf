@@ -71,6 +71,7 @@ public:
   typedef T const& reference;
   typedef std::random_access_iterator_tag iterator_category;
 
+  counting_iterator() { std::terminate(); }
   explicit counting_iterator(value_type v) : value(v) { }
 
   value_type operator*() const { return value; }
