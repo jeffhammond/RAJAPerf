@@ -8,9 +8,9 @@
 
 #include "EDGE3D.hpp"
 
-#if defined(BUILD_STDPAR)
-
 #include "RAJA/RAJA.hpp"
+
+#if defined(BUILD_STDPAR)
 
 #include "common/StdParUtils.hpp"
 
@@ -26,6 +26,7 @@ namespace apps
 
 void EDGE3D::runStdParVariant(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx))
 {
+#if defined(RUN_STDPAR)
   const Index_type run_reps = getRunReps();
   const Index_type ibegin = m_domain->fpz;
   const Index_type iend = m_domain->lpz+1;
@@ -68,4 +69,3 @@ void EDGE3D::runStdParVariant(VariantID vid, size_t RAJAPERF_UNUSED_ARG(tune_idx
 } // end namespace rajaperf
 
 #endif  // BUILD_STDPAR
-
